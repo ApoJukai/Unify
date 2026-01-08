@@ -25,13 +25,13 @@
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; }
         .leaf-icon { position: absolute; top: -8px; right: -5px; color: var(--accent); transform: rotate(15deg); }
         
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; font-weight: 700; color: rgba(255,255,255,0.7); transition: 0.3s; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; font-weight: 700; color: rgba(255,255,255,0.7); transit[...]
         .nav-item.active { background: var(--primary); color: #fff; }
         
-        .create-btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; font-family: 'Montserrat'; cursor: pointer; margin-bottom: 25px; }
+        .create-btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; font-family: 'Montserrat'; cursor: pointer; margin-bottom[...]
 
         .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
-        .data-btn { flex: 1; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .data-btn { flex: 1; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: poin[...]
 
         /* Main */
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 30px 0 0 30px; margin: 10px 0; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
@@ -73,7 +73,7 @@
         
         .t-grid { flex: 1; overflow-x: auto; position: relative; scroll-behavior: smooth; }
         .t-day { width: 80px; flex-shrink: 0; border-right: 1px solid #eee; text-align: center; font-size: 10px; padding: 15px 0; font-weight: 700; color: var(--text-muted); }
-        .t-bar { position: absolute; height: 32px; border-radius: 16px; color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 5; transition: transform 0.2s; }
+        .t-bar { position: absolute; height: 32px; border-radius: 16px; color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-spa[...]
         .t-bar:hover { transform: scale(1.02); filter: brightness(1.1); }
 
         .t-side-row { display: flex; height: 50px; border-bottom: 1px solid var(--border); align-items: center; }
@@ -121,7 +121,7 @@
             <h1 id="view-title">Kanban Board</h1>
             <div style="position: relative; width: 300px;">
                 <i data-lucide="search" style="position: absolute; left: 12px; top: 10px; color: var(--text-muted); width: 18px;"></i>
-                <input type="text" id="globalSearch" placeholder="Find a task..." oninput="renderActive()" style="width:100%; padding: 10px 15px 10px 40px; border-radius: 12px; border: 1px solid var(--border); outline: none;">
+                <input type="text" id="globalSearch" placeholder="Find a task..." oninput="renderActive()" style="width:100%; padding: 10px 15px 10px 40px; border-radius: 12px; border: 1px solid var(-[...]
             </div>
         </header>
 
@@ -144,7 +144,7 @@
 
         <div id="view-list" class="view-section">
             <div class="list-controls" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center;">
-                <button onclick="toggleDateSort()" class="data-btn" style="background: white; color: var(--text-main); border: 1px solid var(--border); width: auto; padding: 10px 15px; min-width: 180px;">
+                <button onclick="toggleDateSort()" class="data-btn" style="background: white; color: var(--text-main); border: 1px solid var(--border); width: auto; padding: 10px 15px; min-width: 180p[...]
                     <i data-lucide="calendar" size="14"></i> Sort: <span id="sortDirText">Manual</span>
                 </button>
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -202,8 +202,8 @@
                 <h2 style="font-family:'Montserrat'; margin-bottom:25px; color:var(--primary-dark)">Task Editor</h2>
                 <form id="taskForm">
                     <input type="hidden" id="editId">
-                    <input type="text" id="mName" placeholder="Task Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px; font-weight:700" required>
-                    <textarea id="mDesc" placeholder="Describe your vision..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); height:120px; margin-bottom:15px; resize:none"></textarea>
+                    <input type="text" id="mName" placeholder="Task Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px; font-weight:700" requ[...]
+                    <textarea id="mDesc" placeholder="Describe your vision..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); height:120px; margin-bottom:15px; re[...]
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
                         <label style="font-size:10px; color:var(--text-muted); font-weight:700">START DATE
                             <input type="date" id="mStart" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); margin-top:5px">
@@ -231,7 +231,7 @@
                 <h4 style="font-size:11px; letter-spacing:1px; color:var(--text-muted); margin-bottom:15px; font-weight:800">Task Notes</h4>
                 <div id="chatContainer" class="chat-container"></div>
                 <div style="display:flex; gap:8px; margin-bottom:20px">
-                    <input type="text" id="chatInput" placeholder="Write a note..." style="flex:1; padding:10px 15px; border-radius:20px; border:1px solid var(--border); font-size:12px" onkeypress="if(event.key==='Enter') addComment()">
+                    <input type="text" id="chatInput" placeholder="Write a note..." style="flex:1; padding:10px 15px; border-radius:20px; border:1px solid var(--border); font-size:12px" onkeypress="if[...]
                     <button onclick="addComment()" style="background:var(--primary); color:white; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer">+</button>
                 </div>
                 <h4 style="font-size:11px; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; font-weight:800">SYSTEM LOG</h4>
@@ -247,7 +247,61 @@
         let dateSortDir = 'none'; 
         let draggedIdx = null;
 
-        function save() { localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); renderActive(); }
+        // Fully replace save() so it writes directly to the GitHub repo using the Contents API.
+        // Usage: await save(GITHUB_TOKEN, tasksData)
+        // Note: token must have repo permissions for this to succeed.
+        async function save(token, tasksData) {
+            if (!token) throw new Error('GitHub token is required for save(). Call save(token, tasksData).');
+            const OWNER = 'ApoJukai';
+            const REPO = 'Unify';
+            const PATH = 'tasks.json';
+            const URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`;
+
+            // 1. Get the current file to get its SHA (required for updates). If file doesn't exist, GitHub returns 404.
+            const getFile = await fetch(URL, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!getFile.ok && getFile.status !== 404) {
+                const txt = await getFile.text();
+                throw new Error('Failed to retrieve file info from GitHub: ' + getFile.status + ' ' + txt);
+            }
+
+            const fileData = getFile.status === 404 ? null : await getFile.json();
+            const sha = fileData && fileData.sha ? fileData.sha : undefined;
+
+            // Robust Base64 encoding for Unicode content
+            function base64EncodeUnicode(str) {
+                return btoa(unescape(encodeURIComponent(str)));
+            }
+
+            const contentObj = tasksData || tasks;
+            const body = {
+                message: "Update tasks via PlanTask UI",
+                content: base64EncodeUnicode(JSON.stringify(contentObj, null, 2))
+            };
+            if (sha) body.sha = sha;
+
+            const response = await fetch(URL, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                alert("Synced to GitHub successfully!");
+            } else {
+                const errText = await response.text();
+                throw new Error('GitHub API error: ' + response.status + ' ' + errText);
+            }
+        }
 
         function getFiltered() {
             const q = document.getElementById('globalSearch').value.toLowerCase();
@@ -294,7 +348,9 @@
             const id = e.dataTransfer.getData("text");
             const newStatus = e.currentTarget.id;
             tasks = tasks.map(t => t.id == id ? {...t, status: newStatus, logs: [`Moved to ${newStatus} (${new Date().toLocaleTimeString()})`, ...(t.logs||[])]} : t);
-            save();
+            // Note: save() now writes to GitHub and requires a token. To persist locally, still call:
+            localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
+            renderActive();
         }
 
         function dragList(e, id) {
@@ -324,7 +380,8 @@
             if (draggedIdx !== null && targetIdx !== -1) {
                 const [movedItem] = tasks.splice(draggedIdx, 1);
                 tasks.splice(targetIdx, 0, movedItem);
-                save();
+                localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
+                renderActive();
             }
             draggedIdx = null;
         }
@@ -380,8 +437,8 @@
                     <td style="text-align:right">
                         <div style="display:flex; gap:10px; justify-content:flex-end">
                             <button onclick="openModal(${t.id})" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="edit-3" size="16"></i></button>
-                            ${!t.archived && t.status === 'Finished' ? `<button onclick="toggleArchive(${t.id}, true)" style="border:none; background:none; cursor:pointer; color:var(--accent)"><i data-lucide="package" size="16"></i></button>` : ''}
-                            ${t.archived ? `<button onclick="toggleArchive(${t.id}, false)" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="refresh-cw" size="16"></i></button>` : ''}
+                            ${!t.archived && t.status === 'Finished' ? `<button onclick="toggleArchive(${t.id}, true)" style="border:none; background:none; cursor:pointer; color:var(--accent)"><i data[...]
+                            ${t.archived ? `<button onclick="toggleArchive(${t.id}, false)" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="refresh-cw" size=[...]
                             <button onclick="deleteTask(${t.id})" style="border:none; background:none; cursor:pointer; color:#ff4444"><i data-lucide="trash-2" size="16"></i></button>
                         </div>
                     </td>
@@ -416,9 +473,9 @@
                 if (offsetDays + durationDays > 0 && offsetDays < 30) {
                     const leftPos = offsetDays * dayWidth; const barWidth = durationDays * dayWidth;
                     const statusColor = t.status === 'Finished' ? 'var(--accent)' : 'var(--primary)';
-                    bars.innerHTML += `<div class="t-bar" onclick="openModal(${t.id})" style="top:${i * rowHeight + 9}px; left:${leftPos}px; width:${barWidth}px; background:${statusColor}">${t.name}</div>`;
+                    bars.innerHTML += `<div class="t-bar" onclick="openModal(${t.id})" style="top:${i * rowHeight + 9}px; left:${leftPos}px; width:${barWidth}px; background:${statusColor}">${t.name}</[...]
                 }
-                side.innerHTML += `<div class="t-side-row"><div class="t-side-cell" style="flex: 2; font-weight: 700;">${t.name}</div><div class="t-side-cell" style="flex: 1; border-left: 1px solid var(--border); color: var(--text-muted); font-size: 11px;">${t.owner || '-'}</div></div>`;
+                side.innerHTML += `<div class="t-side-row"><div class="t-side-cell" style="flex: 2; font-weight: 700;">${t.name}</div><div class="t-side-cell" style="flex: 1; border-left: 1px solid va[...]
             });
         }
 
@@ -429,17 +486,17 @@
             document.getElementById('insight-box').innerHTML = `
                 <div style="background:var(--primary); color:white; padding:20px; border-radius:20px"><h4>Total Tasks</h4><h2 style="font-size:28px">${total}</h2></div>
                 <div style="background:white; border:1px solid var(--border); padding:20px; border-radius:20px"><h4>Bloomed</h4><h2 style="font-size:28px">${done}</h2></div>
-                <div style="background:white; border:1px solid var(--border); padding:20px; border-radius:20px"><h4>Growth Rate</h4><h2 style="font-size:28px">${total?Math.round(done/total*100):0}%</h2></div>
+                <div style="background:white; border:1px solid var(--border); padding:20px; border-radius:20px"><h4>Growth Rate</h4><h2 style="font-size:28px">${total?Math.round(done/total*100):0}%</h[...]
                 <div style="background:var(--accent); color:white; padding:20px; border-radius:20px"><h4>Active Task</h4><h2 style="font-size:28px">${active}</h2></div>
             `;
             if(charts.s) charts.s.destroy();
             charts.s = new Chart(document.getElementById('c-status'), {
-                type: 'doughnut', data: { labels: ['To Do', 'Active', 'Done'], datasets: [{ data: [f.filter(t=>t.status==='Not Started').length, active, done], backgroundColor: ['#e2e8f0', '#7B61FF', '#4CAF50'] }] },
+                type: 'doughnut', data: { labels: ['To Do', 'Active', 'Done'], datasets: [{ data: [f.filter(t=>t.status==='Not Started').length, active, done], backgroundColor: ['#e2e8f0', '#7B61FF', [...]
                 options: { maintainAspectRatio: false }
             });
             if(charts.p) charts.p.destroy();
             charts.p = new Chart(document.getElementById('c-priority'), {
-                type: 'bar', data: { labels: ['High', 'Medium', 'Low'], datasets: [{ label: 'Priority', data: ['High','Medium','Low'].map(p=>f.filter(t=>t.importance===p).length), backgroundColor: '#7B61FF' }] },
+                type: 'bar', data: { labels: ['High', 'Medium', 'Low'], datasets: [{ label: 'Priority', data: ['High','Medium','Low'].map(p=>f.filter(t=>t.importance===p).length), backgroundColor: '#7[...]
                 options: { maintainAspectRatio: false }
             });
         }
@@ -474,7 +531,8 @@
             if(id) {
                 const t = tasks.find(x => x.id == id);
                 t.comments = t.comments || []; t.comments.push(msg);
-                save(); openModal(id);
+                localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
+                renderActive(); openModal(id);
             } else {
                 tempComments.push(msg);
                 document.getElementById('chatContainer').innerHTML += `<div class="sms-bubble sms-mine">${msg.text}</div>`;
@@ -501,11 +559,14 @@
             };
             if(id) tasks = tasks.map(t => t.id == id ? {...t, ...obj} : t);
             else tasks.push(obj);
-            save(); closeModal();
+            // save() now writes to GitHub and requires a token. Persist locally by default:
+            localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
+            renderActive();
+            closeModal();
         };
 
-        function toggleArchive(id, state) { tasks = tasks.map(t => t.id == id ? {...t, archived: state} : t); save(); }
-        function deleteTask(id) { if(confirm("Delete this task?")) { tasks = tasks.filter(t => t.id != id); save(); } }
+        function toggleArchive(id, state) { tasks = tasks.map(t => t.id == id ? {...t, archived: state} : t); localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); renderActive(); }
+        function deleteTask(id) { if(confirm("Delete this task?")) { tasks = tasks.filter(t => t.id != id); localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); renderActive(); } }
         function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
         function checkClose(e) { if(e.target.id === 'taskModal') closeModal(); }
         function exportTasks() {
@@ -515,7 +576,7 @@
         function importTasks(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
-            reader.onload = (ev) => { tasks = JSON.parse(ev.target.result); save(); };
+            reader.onload = (ev) => { tasks = JSON.parse(ev.target.result); localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); renderActive(); };
             reader.readAsText(file);
         }
 
