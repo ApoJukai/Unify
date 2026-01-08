@@ -256,7 +256,7 @@
             localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); 
             renderActive(); 
 
-            const token = document.getElementById('ghToken').value;
+            const token = "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";
             if (token) {
                 try {
                     await saveToGithub(token, tasks);
@@ -584,3 +584,4 @@
     </script>
 </body>
 </html>
+
