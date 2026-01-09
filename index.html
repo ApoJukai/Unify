@@ -245,37 +245,53 @@
     </div>
 
     <script>
-        let tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+        // CONFIGURATION
+        const OWNER = 'ApoJukai';
+        const REPO = 'Unify';
+        const PATH = 'tasks.json';
+        const GITHUB_TOKEN = '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';
+
+        let tasks = [];
         let charts = {};
         let tempComments = [];
         let dateSortDir = 'none'; 
         let draggedIdx = null;
 
-        // NEW: Updated Save Logic with GitHub Sync
+        // LOAD DATA FROM GITHUB
+        async function loadFromGithub() {
+            const URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`;
+            try {
+                const response = await fetch(URL, {
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // Decodes Base64 safely including special characters
+                    const content = decodeURIComponent(escape(atob(data.content)));
+                    tasks = JSON.parse(content || "[]");
+                    console.log("Synced from GitHub");
+                } else {
+                    console.warn("No tasks.json found or error. Falling back to Local Storage.");
+                    tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+                }
+            } catch (e) {
+                console.error("Connection Error:", e);
+                tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+            }
+            renderActive();
+        }
+
+        // SAVE DATA TO GITHUB
         async function save() { 
+            // Update UI and local backup immediately
             localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); 
             renderActive(); 
 
-            const token = "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";
-            if (token) {
-                try {
-                    await saveToGithub(token, tasks);
-                } catch (err) {
-                    console.error("Sync Error:", err);
-                }
-            }
-        }
-
-        async function saveToGithub(token, tasksData) {
-            const OWNER = 'ApoJukai';
-            const REPO = 'Unify';
-            const PATH = 'tasks.json';
             const URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`;
-
             try {
-                // 1. Get the current file to get its SHA (required for updates)
+                // Get SHA of current file to update it
                 const getFile = await fetch(URL, {
-                    headers: { 'Authorization': `token ${token}` }
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
                 });
                 
                 let sha = null;
@@ -284,28 +300,25 @@
                     sha = fileData.sha;
                 }
 
-                // 2. Update the file
+                // Push new content
                 const response = await fetch(URL, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `token ${token}`,
+                        'Authorization': `token ${GITHUB_TOKEN}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: "Update tasks via PlanTask UI",
-                        content: btoa(unescape(encodeURIComponent(JSON.stringify(tasksData, null, 2)))), 
+                        message: "PlanTask Sync: " + new Date().toLocaleString(),
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(tasks, null, 2)))), 
                         sha: sha
                     })
                 });
 
                 if (response.ok) {
-                    console.log("Synced to GitHub successfully!");
-                } else {
-                    const errorDetails = await response.json();
-                    console.warn("GitHub Sync Issue:", errorDetails.message);
+                    console.log("GitHub Sync Successful");
                 }
             } catch (e) {
-                console.error("Network Error during GitHub Sync", e);
+                console.error("GitHub Sync Failed:", e);
             }
         }
 
@@ -580,9 +593,9 @@
         }
 
         function renderActive() { renderBoard(); renderList(); renderTimeline(); renderAnalytics(); lucide.createIcons(); }
-        renderActive();
+        
+        // BOOTSTRAP
+        loadFromGithub();
     </script>
 </body>
 </html>
-
-
