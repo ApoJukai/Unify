@@ -272,11 +272,11 @@
                     console.log("Synced from GitHub");
                 } else {
                     console.warn("No tasks.json found or error. Falling back to Local Storage.");
-                    tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+                    tasks = JSON.parse(localStorage.getItem('index')) || [];
                 }
             } catch (e) {
                 console.error("Connection Error:", e);
-                tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+                tasks = JSON.parse(localStorage.getItem('index')) || [];
             }
             renderActive();
         }
@@ -284,7 +284,7 @@
         // SAVE DATA TO GITHUB
         async function save() { 
             // Update UI and local backup immediately
-            localStorage.setItem('PlanTask_V1', JSON.stringify(tasks)); 
+            localStorage.setItem('index', JSON.stringify(tasks)); 
             renderActive(); 
 
             const URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`;
@@ -599,3 +599,4 @@
     </script>
 </body>
 </html>
+
