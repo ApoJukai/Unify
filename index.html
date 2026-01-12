@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlanTask Pro | Live Collaboration</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
+    <title>PlanTask Pro | 2026 Enterprise</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Lato:wght@400;700&display=swap" rel="stylesheet">
@@ -16,60 +13,68 @@
             --bg-main: #F8FAFC; --bg-sidebar: #1E293B; --text-main: #1E293B;
             --text-muted: #64748B; --border: #E2E8F0; --white: #FFFFFF;
             --p-high: #EF4444; --p-med: #F59E0B; --p-low: #94A3B8;
-            --today: #FF4D4D;
+            --today: #FF4D4D; --danger: #F43F5E;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Lato', sans-serif; }
-        h1, h2, h3, h4, .logo-flex, .create-btn, .nav-item, th, .t-header { font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3, h4, .logo-flex, .create-btn, .nav-item, th, .t-header, .filter-label { font-family: 'Montserrat', sans-serif; }
 
         body { background: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
+        /* Sidebar */
         aside { width: 260px; background: var(--bg-sidebar); padding: 25px; display: flex; flex-direction: column; color: var(--white); flex-shrink: 0; }
         .logo-flex { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; font-size: 22px; font-weight: 800; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; cursor: pointer; margin-bottom: 6px; color: #94A3B8; transition: 0.3s; font-size: 14px; font-weight: 700; }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
         .nav-item.active { background: var(--primary); color: var(--white); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-        .create-btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; margin-bottom: 30px; width: 100%; font-weight: 800; }
+        .create-btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; margin-bottom: 30px; width: 100%; font-weight: 800; letter-spacing: 0.5px; }
         
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         header { padding: 20px 40px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .search-bar input { width: 300px; padding: 12px 15px 12px 40px; border-radius: 12px; border: 1px solid var(--border); background: #F1F5F9; outline: none; }
         .view-section { display: none; padding: 30px 40px; overflow-y: auto; flex: 1; }
 
-        .timeline-controls { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        /* Timeline Controls */
+        .timeline-controls { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 16px; border: 1px solid var(--border); }
+        .filter-label { font-size: 11px; font-weight: 800; color: var(--text-muted); margin-right: 8px; }
+
+        /* Timeline Table */
         .timeline-wrapper { display: flex; border: 1px solid var(--border); border-radius: 16px; height: 500px; background: white; overflow: hidden; }
         .t-sidebar { width: 220px; border-right: 1px solid var(--border); background: #F8FAFC; flex-shrink: 0; }
         .t-grid { flex: 1; overflow-x: auto; position: relative; }
-        .t-header { height: 50px; border-bottom: 1px solid var(--border); background: #F8FAFC; display: flex; align-items: center; font-size: 10px; font-weight: 800; }
+        .t-header { height: 50px; border-bottom: 1px solid var(--border); background: #F8FAFC; display: flex; align-items: center; font-size: 10px; font-weight: 800; color: var(--text-muted); }
         .t-row { height: 50px; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; padding: 0 15px; font-size: 13px; font-weight: 700; }
-        .t-bar { position: absolute; height: 32px; top: 9px; border-radius: 8px; color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; padding: 0 12px; cursor: pointer; z-index: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .t-bar { position: absolute; height: 32px; top: 9px; border-radius: 8px; color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-space: nowrap; z-index: 2; }
+        .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today); z-index: 5; pointer-events: none; }
+        .today-line::before { content: 'TODAY'; position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: var(--today); color: white; font-size: 8px; padding: 2px 4px; border-radius: 2px; font-family: 'Montserrat'; }
 
+        /* List Styling & Font Consistency */
         .card-container { background: var(--white); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
         .list-table { width: 100%; border-collapse: collapse; }
-        .list-table th { background: #F8FAFC; text-align: left; padding: 15px 20px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
-        .list-row td { padding: 15px 20px; border-bottom: 1px solid var(--border); }
-        .priority-badge { font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
+        .list-table th { background: #F8FAFC; text-align: left; padding: 18px 20px; font-size: 11px; font-weight: 800; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+        .list-row td { padding: 18px 20px; vertical-align: middle; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .priority-badge { font-family: 'Montserrat'; font-size: 10px; padding: 5px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
+        .status-pill { font-family: 'Montserrat'; font-size: 10px; font-weight: 800; background: #F1F5F9; padding: 5px 10px; border-radius: 6px; text-transform: uppercase; }
         .p-high { background: #FEE2E2; color: #B91C1C; }
         .p-medium { background: #FEF3C7; color: #B45309; }
         .p-low { background: #F1F5F9; color: #475569; }
 
+        /* Modal & Chat */
         .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-card { background: white; width: 1000px; border-radius: 28px; display: grid; grid-template-columns: 1fr 380px; height: 85vh; overflow: hidden; }
         .chat-area { background: #F8FAFC; border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 25px; }
-        .sms-bubble { max-width: 90%; padding: 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; line-height: 1.4; }
-        .sms-user { background: var(--primary); color: white; align-self: flex-end; }
-        .sms-system { background: #E2E8F0; color: var(--text-main); align-self: flex-start; border-left: 4px solid var(--primary); }
-        .ts-tag { display: block; font-size: 9px; opacity: 0.6; margin-top: 4px; font-weight: 800; }
+        .sms-bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 13px; margin-bottom: 12px; line-height: 1.4; }
+        .sms-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .sms-system { background: #E2E8F0; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; font-style: italic; font-size: 11px; }
 
-        .btn-icon { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border); background: white; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        /* Buttons */
+        .btn-icon { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border); background: white; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; margin-left: 4px; color: var(--text-muted); }
+        .btn-icon:hover { background: #F1F5F9; color: var(--primary); border-color: var(--primary); }
+        .btn-icon.danger:hover { color: var(--danger); border-color: var(--danger); }
         
-        input, select, textarea { border: 1px solid var(--border); padding: 10px; border-radius: 8px; outline: none; }
-        .reset-btn { padding: 8px 12px; background: #F1F5F9; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-size: 11px; font-weight: 800; }
-
-        .stats-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-box { background: var(--white); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
-        .grid-insights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 40px; }
-        .chart-container { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--border); height: 300px; }
+        .cancel-btn { background: #F1F5F9; color: var(--text-main); border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 800; transition: 0.2s; flex: 1; }
+        
+        input, select, textarea { border: 1px solid var(--border); padding: 10px; border-radius: 8px; outline: none; transition: 0.2s; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -97,33 +102,52 @@
 
         <div id="view-board" class="view-section" style="display: block;">
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-                <div ondrop="drop(event, 'Not Started')" ondragover="allow(event)" style="background:#EDF2F7; padding:20px; border-radius:24px; min-height:70vh;">
-                    <h4 style="font-size:11px; color:var(--text-muted); margin-bottom:15px;">BACKLOG</h4>
+                <div class="kanban-col" ondrop="drop(event, 'Not Started')" ondragover="allow(event)" style="background:#EDF2F7; padding:20px; border-radius:24px; min-height:70vh;">
+                    <h4 style="font-size:11px; color:var(--text-muted); margin-bottom:15px; letter-spacing:1px;">BACKLOG</h4>
                     <div id="board-notstarted"></div>
                 </div>
-                <div ondrop="drop(event, 'In-Progress')" ondragover="allow(event)" style="background:#EDF2F7; padding:20px; border-radius:24px;">
-                    <h4 style="font-size:11px; color:var(--primary); margin-bottom:15px;">ACTIVE</h4>
+                <div class="kanban-col" ondrop="drop(event, 'In-Progress')" ondragover="allow(event)" style="background:#EDF2F7; padding:20px; border-radius:24px;">
+                    <h4 style="font-size:11px; color:var(--primary); margin-bottom:15px; letter-spacing:1px;">ACTIVE</h4>
                     <div id="board-inprogress"></div>
                 </div>
-                <div ondrop="drop(event, 'Finished')" ondragover="allow(event)" style="background:#EDF2F7; padding:20px; border-radius:24px;">
-                    <h4 style="font-size:11px; color:var(--accent); margin-bottom:15px;">DONE</h4>
+                <div class="kanban-col" ondrop="drop(event, 'Finished')" ondragover="allow(event)" style="background:#EDF2F7; padding:20px; border-radius:24px;">
+                    <h4 style="font-size:11px; color:var(--accent); margin-bottom:15px; letter-spacing:1px;">DONE</h4>
                     <div id="board-finished"></div>
                 </div>
             </div>
         </div>
 
         <div id="view-list" class="view-section">
+            <div style="margin-bottom: 20px; display:flex; align-items:center; gap:10px">
+                <span class="filter-label">SORT TASKS:</span>
+                <select id="sortBy" style="padding:8px; border-radius:8px; font-weight:700" onchange="renderActive()">
+                    <option value="manual">Manual Reorder</option>
+                    <option value="priority">Sort by Priority</option>
+                    <option value="name">Sort by Name</option>
+                </select>
+            </div>
             <div class="card-container">
                 <table class="list-table">
-                    <thead><tr><th></th><th>Task</th><th>Owner</th><th>Priority</th><th>Status</th><th style="text-align:right">Action</th></tr></thead>
+                    <thead><tr><th style="width:40px"></th><th>Task & Description</th><th>Owner</th><th>Priority</th><th>Status</th><th style="text-align:right">Action</th></tr></thead>
                     <tbody id="list-tbody"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="view-timeline" class="view-section">
+            <div class="timeline-controls">
+                <div>
+                    <span class="filter-label">TIMELINE START:</span>
+                    <input type="date" id="tlStart" onchange="renderTimeline()">
+                </div>
+                <div>
+                    <span class="filter-label">TIMELINE END:</span>
+                    <input type="date" id="tlEnd" onchange="renderTimeline()">
+                </div>
+                <button class="btn-icon" title="Reset View" onclick="resetTimelineRange()"><i data-lucide="refresh-cw" size="14"></i></button>
+            </div>
             <div class="timeline-wrapper">
-                <div class="t-sidebar"><div class="t-header" style="padding:0 15px;">RESOURCE</div><div id="t-side-rows"></div></div>
+                <div class="t-sidebar"><div class="t-header" style="padding:0 15px;">RESOURCE ALLOCATION</div><div id="t-side-rows"></div></div>
                 <div class="t-grid">
                     <div id="t-headers" class="t-header" style="width:max-content;"></div>
                     <div id="t-bars-rows" style="position:relative; width:max-content;"></div>
@@ -134,7 +158,9 @@
         <div id="view-analytics" class="view-section">
             <div class="stats-summary" id="stat-cards"></div>
             <div class="grid-insights">
+                <div class="chart-container"><canvas id="c-velocity"></canvas></div>
                 <div class="chart-container"><canvas id="c-status"></canvas></div>
+                <div class="chart-container"><canvas id="c-workload"></canvas></div>
                 <div class="chart-container"><canvas id="c-priority"></canvas></div>
             </div>
         </div>
@@ -142,7 +168,7 @@
         <div id="view-archive" class="view-section">
             <div class="card-container">
                 <table class="list-table">
-                    <thead><tr><th>Task</th><th>Owner</th><th>Closed Date</th><th style="text-align:right">Restore</th></tr></thead>
+                    <thead><tr><th>Archived Task Name</th><th>Original Owner</th><th>Harvested On</th><th style="text-align:right">Restore</th></tr></thead>
                     <tbody id="archive-tbody"></tbody>
                 </table>
             </div>
@@ -152,90 +178,173 @@
     <div class="modal" id="taskModal">
         <div class="modal-card">
             <div style="padding:40px; overflow-y:auto">
-                <h3 style="margin-bottom:20px; font-weight:800; color:var(--primary);">Task Editor</h3>
+                <h3 style="margin-bottom:30px; font-weight:800; color:var(--primary); font-size:22px;">Task Editor</h3>
                 <form id="taskForm">
                     <input type="hidden" id="editId">
-                    <div style="margin-bottom:15px"><label style="font-size:11px; font-weight:800;">NAME</label><input type="text" id="mName" style="width:100%;" required></div>
-                    <div style="margin-bottom:15px"><label style="font-size:11px; font-weight:800;">DESCRIPTION</label><textarea id="mDesc" rows="2" style="width:100%; resize:none;"></textarea></div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                        <div><label style="font-size:11px;">START</label><input type="date" id="mStart" style="width:100%"></div>
-                        <div><label style="font-size:11px;">DUE</label><input type="date" id="mEnd" style="width:100%"></div>
+                    <div style="margin-bottom:20px">
+                        <label style="font-size:11px; font-weight:800; color:var(--text-muted)">TASK IDENTIFIER</label>
+                        <input type="text" id="mName" style="width:100%; margin-top:5px;" required>
                     </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                        <div><label style="font-size:11px;">OWNER</label><input type="text" id="mOwner" style="width:100%"></div>
-                        <div><label style="font-size:11px;">PRIORITY</label><select id="mImp" style="width:100%"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+                    <div style="margin-bottom:20px">
+                        <label style="font-size:11px; font-weight:800; color:var(--text-muted)">DESCRIPTION</label>
+                        <textarea id="mDesc" rows="3" style="width:100%; margin-top:5px; resize:none;"></textarea>
                     </div>
-                    <div style="margin-bottom:25px"><label style="font-size:11px;">STATUS</label><select id="mStat" style="width:100%"><option>Not Started</option><option>In-Progress</option><option>Finished</option></select></div>
-                    <div style="display:flex; gap:10px;"><button type="button" class="reset-btn" style="flex:1" onclick="closeModal()">CANCEL</button><button type="submit" class="create-btn" style="flex:2; margin:0">SAVE</button></div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+                        <div><label style="font-size:11px; font-weight:800;">START DATE</label><input type="date" id="mStart" style="width:100%"></div>
+                        <div><label style="font-size:11px; font-weight:800;">DUE DATE</label><input type="date" id="mEnd" style="width:100%"></div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px;">
+                        <div><label style="font-size:11px; font-weight:800;">ASSIGNEE</label><input type="text" id="mOwner" style="width:100%"></div>
+                        <div><label style="font-size:11px; font-weight:800;">PRIORITY</label>
+                            <select id="mImp" style="width:100%"><option>High</option><option selected>Medium</option><option>Low</option></select>
+                        </div>
+                    </div>
+                    <select id="mStat" style="width:100%; background:#F1F5F9; border:none; font-weight:800; color:var(--primary); margin-bottom:30px;"><option>Not Started</option><option>In-Progress</option><option>Finished</option></select>
+                    <div style="display:flex; gap:12px;">
+                        <button type="button" class="cancel-btn" onclick="closeModal()">CANCEL</button>
+                        <button type="submit" class="create-btn" style="flex:2; margin-bottom:0">SAVE CHANGES</button>
+                    </div>
                 </form>
             </div>
             <div class="chat-area">
-                <h4 style="font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:15px;">ACTIVITY LOG</h4>
+                <h4 style="font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:20px;">SYSTEM LOG & NOTES</h4>
                 <div id="chatContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column;"></div>
-                <div style="display:flex; gap:8px; padding-top:10px;">
-                    <input type="text" id="chatInput" placeholder="Add note..." style="flex:1" onkeypress="if(event.key==='Enter') addNote()">
-                    <button onclick="addNote()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;"><i data-lucide="send" size="14"></i></button>
+                <div style="display:flex; gap:8px; padding-top:15px;">
+                    <input type="text" id="chatInput" placeholder="Add a note..." style="flex:1" onkeypress="if(event.key==='Enter') addNote()">
+                    <button onclick="addNote()" style="background:var(--primary); color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;"><i data-lucide="send" size="16"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. REPLACE THESE WITH YOUR FIREBASE KEYS
-        const firebaseConfig = {
-            apiKey: "AIzaSyA1lEjH3Fh747RdRQ-2emPnv_aJqb2Zywo",
-            authDomain: "plantask-collaborative.firebaseapp.com",
-            projectId: "plantask-collaborative",
-            storageBucket: "plantask-collaborative.firebasestorage.app",
-            messagingSenderId: "75156468250",
-            appId: "1:75156468250:web:d5a61c2c78f9195be117a3"
-	measurementId: "G-D4FMXZLX7N"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        let tasks = [];
+        let tasks = JSON.parse(localStorage.getItem('PlanTask_Data')) || [];
         let activeCharts = {};
+        let dragSrc = null;
 
-        // Listen for Real-time Updates
-        db.collection("tasks").onSnapshot((snapshot) => {
-            tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderActive();
-        });
+        // Initialize Timeline Range
+        function resetTimelineRange() {
+            let start = new Date(); start.setDate(start.getDate() - 5);
+            let end = new Date(); end.setDate(end.getDate() + 30);
+            document.getElementById('tlStart').value = start.toISOString().split('T')[0];
+            document.getElementById('tlEnd').value = end.toISOString().split('T')[0];
+            renderTimeline();
+        }
+        resetTimelineRange();
 
-        function getTS() { return new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+        function save() { localStorage.setItem('PlanTask_Data', JSON.stringify(tasks)); renderActive(); }
+        function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
 
         function renderActive() {
             const q = document.getElementById('globalSearch').value.toLowerCase();
-            let filtered = tasks.filter(t => !t.archived && (t.name.toLowerCase().includes(q)));
+            const sortVal = document.getElementById('sortBy')?.value || 'manual';
+            let filtered = tasks.filter(t => !t.archived && (t.name.toLowerCase().includes(q) || (t.desc||'').toLowerCase().includes(q)));
             
-            const colIds = {'Not Started': 'board-notstarted', 'In-Progress': 'board-inprogress', 'Finished': 'board-finished'};
-            Object.values(colIds).forEach(id => document.getElementById(id).innerHTML = '');
-            
+            if (sortVal === 'priority') {
+                const map = {High:1, Medium:2, Low:3};
+                filtered.sort((a,b) => map[a.importance] - map[b.importance]);
+            } else if (sortVal === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+            // Board View
+            const cols = {'Not Started': 'board-notstarted', 'In-Progress': 'board-inprogress', 'Finished': 'board-finished'};
+            Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
             filtered.forEach(t => {
-                const ts = t.logs && t.logs.length ? t.logs[t.logs.length-1].time : 'New';
-                document.getElementById(colIds[t.status]).innerHTML += `
-                    <div class="task-card" onclick="openModal('${t.id}')" draggable="true" ondragstart="drag(event, '${t.id}')" style="background:white; padding:15px; border-radius:14px; margin-bottom:10px; border-left:4px solid ${t.importance==='High'?'#EF4444':'#6366F1'}; cursor:grab; box-shadow:0 2px 4px rgba(0,0,0,0.05)">
-                        <div style="font-weight:700; font-size:13px;">${t.name}</div>
-                        <div style="font-size:9px; color:var(--text-muted); margin-top:5px;">Updated: ${ts}</div>
+                document.getElementById(cols[t.status]).innerHTML += `
+                    <div class="task-card" onclick="openModal(${t.id})" draggable="true" ondragstart="drag(event, ${t.id})" style="background:white; padding:16px; border-radius:16px; margin-bottom:12px; border-top:4px solid ${t.importance==='High'?'var(--p-high)':'#E2E8F0'}; cursor:grab; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05)">
+                        <div style="font-weight:800; font-size:14px; margin-bottom:6px;">${t.name}</div>
+                        <div style="font-size:11px; color:var(--text-muted); font-family:'Montserrat'; font-weight:700;">${t.owner ? t.owner.toUpperCase() : 'NO OWNER'}</div>
                     </div>`;
             });
 
+            // Improved List View
             document.getElementById('list-tbody').innerHTML = filtered.map(t => `
-                <tr class="list-row">
-                    <td><i data-lucide="grip-vertical" size="14" style="color:#CBD5E1"></i></td>
-                    <td style="font-weight:700">${t.name}</td>
-                    <td>${t.owner || '-'}</td>
+                <tr class="list-row" draggable="${sortVal==='manual'}" ondragstart="hDrag(event, ${t.id})" ondragover="event.preventDefault()" ondrop="hDrop(event, ${t.id})">
+                    <td style="color:var(--text-muted); padding-left:20px;">${sortVal==='manual' ? '<i data-lucide="grip-vertical" size="14"></i>' : ''}</td>
+                    <td><div style="font-weight:800; font-size:15px;">${t.name}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${t.desc || ''}</div></td>
+                    <td style="font-size:12px; font-weight:800; font-family:'Montserrat'">${t.owner ? t.owner.toUpperCase() : '-'}</td>
                     <td><span class="priority-badge p-${t.importance.toLowerCase()}">${t.importance}</span></td>
-                    <td><span style="font-size:10px; font-weight:800">${t.status}</span></td>
-                    <td style="text-align:right">
-                        <button class="btn-icon" onclick="openModal('${t.id}')"><i data-lucide="edit-3" size="14"></i></button>
+                    <td><span class="status-pill">${t.status}</span></td>
+                    <td style="text-align:right; padding-right:15px;">
+                        <button class="btn-icon" onclick="openModal(${t.id})"><i data-lucide="edit-3" size="14"></i></button>
+                        ${t.status === 'Finished' ? `<button class="btn-icon" onclick="toggleArchive(${t.id}, true)"><i data-lucide="package" size="14"></i></button>` : ''}
+                        <button class="btn-icon danger" onclick="deleteTask(${t.id})"><i data-lucide="trash-2" size="14"></i></button>
                     </td>
+                </tr>`).join('');
+
+            // Improved Archive
+            document.getElementById('archive-tbody').innerHTML = tasks.filter(t => t.archived).map(t => `
+                <tr class="list-row">
+                    <td style="font-weight:800">${t.name}</td>
+                    <td style="font-family:'Montserrat'; font-size:12px; font-weight:800">${t.owner ? t.owner.toUpperCase() : '-'}</td>
+                    <td style="color:var(--text-muted)">${t.closedOn}</td>
+                    <td style="text-align:right"><button class="btn-icon" onclick="toggleArchive(${t.id}, false)"><i data-lucide="rotate-ccw" size="14"></i></button></td>
                 </tr>`).join('');
 
             renderTimeline();
             renderStats();
             lucide.createIcons();
+        }
+
+        function renderTimeline() {
+            const side = document.getElementById('t-side-rows'), head = document.getElementById('t-headers'), bars = document.getElementById('t-bars-rows');
+            side.innerHTML = ''; head.innerHTML = ''; bars.innerHTML = '';
+            
+            const startBase = new Date(document.getElementById('tlStart').value + "T00:00:00");
+            const endBase = new Date(document.getElementById('tlEnd').value + "T23:59:59");
+            const daysCount = Math.max(1, Math.ceil((endBase - startBase) / 864e5));
+            const dayW = 80; const today = new Date(); today.setHours(0,0,0,0);
+
+            for(let i=0; i<daysCount; i++) {
+                let d = new Date(startBase); d.setDate(d.getDate() + i);
+                const isToday = d.getTime() === today.getTime();
+                head.innerHTML += `<div style="width:${dayW}px; flex-shrink:0; height:50px; border-right:1px solid #F1F5F9; display:flex; flex-direction:column; align-items:center; justify-content:center; ${isToday?'color:var(--today); font-weight:900':''}"><span>${d.toLocaleDateString([], {day:'numeric'})}</span><span style="font-size:8px">${d.toLocaleDateString([], {month:'short'})}</span></div>`;
+                
+                if(isToday) {
+                    const line = document.createElement('div'); line.className = 'today-line';
+                    line.style.left = (i * dayW) + 'px'; bars.appendChild(line);
+                }
+            }
+
+            tasks.filter(t => !t.archived && t.start && t.end).forEach(t => {
+                const sDate = new Date(t.start + "T00:00:00"), eDate = new Date(t.end + "T23:59:59");
+                const offset = Math.floor((sDate - startBase) / 864e5);
+                const dur = Math.ceil((eDate - sDate) / 864e5);
+
+                if (offset + dur > 0 && offset < daysCount) {
+                    side.innerHTML += `<div class="t-row">${t.name}</div>`;
+                    const row = document.createElement('div'); row.style.height = '50px'; row.style.borderBottom = '1px solid #F1F5F9'; row.style.width = (daysCount * dayW) + 'px';
+                    const bar = document.createElement('div'); bar.className = 't-bar';
+                    bar.style.left = (Math.max(0, offset) * dayW) + 'px';
+                    bar.style.width = (dur * dayW) + 'px';
+                    bar.style.background = t.status === 'Finished' ? 'var(--accent)' : 'var(--primary)';
+                    bar.innerText = t.name; bar.onclick = () => openModal(t.id);
+                    row.appendChild(bar);
+                    bars.appendChild(row);
+                }
+            });
+        }
+
+        function renderStats() {
+            const done = tasks.filter(t=>t.status==='Finished').length;
+            document.getElementById('stat-cards').innerHTML = `
+                <div class="stat-box"><h4>Productivity</h4><div style="font-size:24px; font-weight:800; color:var(--accent)">${Math.round(done/(tasks.length||1)*100)}%</div></div>
+                <div class="stat-box"><h4>Active</h4><div style="font-size:24px; font-weight:800">${tasks.filter(t=>t.status==='In-Progress').length}</div></div>
+                <div class="stat-box"><h4>Backlog</h4><div style="font-size:24px; font-weight:800">${tasks.filter(t=>t.status==='Not Started').length}</div></div>
+                <div class="stat-box"><h4>High Risk</h4><div style="font-size:24px; font-weight:800; color:var(--p-high)">${tasks.filter(t=>t.importance==='High').length}</div></div>`;
+
+            const init = (id, type, labels, data, colors) => {
+                if(activeCharts[id]) activeCharts[id].destroy();
+                activeCharts[id] = new Chart(document.getElementById(id), {
+                    type, data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: colors[0], fill: false }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: id.replace('c-', '').toUpperCase() } } }
+                });
+            };
+            init('c-velocity', 'line', ['W1', 'W2', 'W3', 'W4'], [2, 5, 3, done], ['#6366F1']);
+            init('c-status', 'doughnut', ['Done', 'Active', 'Backlog'], [done, tasks.filter(t=>t.status==='In-Progress').length, tasks.filter(t=>t.status==='Not Started').length], ['#10B981', '#6366F1', '#CBD5E1']);
+            const owners = {}; tasks.forEach(t => { const o = t.owner || 'Unassigned'; owners[o] = (owners[o]||0)+1; });
+            init('c-workload', 'radar', Object.keys(owners), Object.values(owners), ['rgba(99, 102, 241, 0.2)']);
+            const p = {High:0, Medium:0, Low:0}; tasks.forEach(t => p[t.importance]++);
+            init('c-priority', 'polarArea', ['High', 'Med', 'Low'], [p.High, p.Medium, p.Low], ['#EF4444', '#F59E0B', '#94A3B8']);
         }
 
         function openModal(id = null) {
@@ -254,79 +363,54 @@
                 (t.logs || []).forEach(l => {
                     const div = document.createElement('div');
                     div.className = `sms-bubble ${l.type === 'user' ? 'sms-user' : 'sms-system'}`;
-                    div.innerHTML = `${l.msg} <span class="ts-tag">${l.time}</span>`;
+                    div.innerText = l.msg;
                     chat.appendChild(div);
                 });
             }
             document.getElementById('taskModal').style.display = 'flex';
         }
 
-        document.getElementById('taskForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('editId').value;
-            const status = document.getElementById('mStat').value;
-            const logEntry = { msg: id ? "Updated details" : "Task Created", time: getTS(), type: 'system' };
-            
-            const data = {
-                name: document.getElementById('mName').value,
-                desc: document.getElementById('mDesc').value,
-                start: document.getElementById('mStart').value,
-                end: document.getElementById('mEnd').value,
-                owner: document.getElementById('mOwner').value,
-                importance: document.getElementById('mImp').value,
-                status: status,
-                archived: false
-            };
-
-            if(!id) {
-                data.logs = [logEntry];
-                await db.collection("tasks").add(data);
-            } else {
-                const t = tasks.find(x => x.id == id);
-                let logs = t.logs || [];
-                if(t.status !== status) logs.push({msg: `Status: ${status}`, time: getTS(), type:'system'});
-                logs.push(logEntry);
-                data.logs = logs;
-                await db.collection("tasks").doc(id).update(data);
-            }
-            closeModal();
-        };
-
         function addNote() {
             const id = document.getElementById('editId').value;
             const input = document.getElementById('chatInput');
             if(!id || !input.value) return;
-            const t = tasks.find(x => x.id == id);
-            const logs = t.logs || [];
-            logs.push({ msg: input.value, time: getTS(), type: 'user' });
-            db.collection("tasks").doc(id).update({ logs });
-            input.value = ''; openModal(id);
+            const t = tasks.find(x => x.id == parseInt(id));
+            if(!t.logs) t.logs = [];
+            t.logs.push({ type: 'user', msg: input.value });
+            input.value = '';
+            openModal(id);
+            save();
         }
 
-        function switchView(v, el) { 
-            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); 
-            document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); 
-            document.getElementById('view-'+v).style.display='block'; 
-            renderActive(); 
+        document.getElementById('taskForm').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const obj = { 
+                id: id ? parseInt(id) : Date.now(), 
+                name: document.getElementById('mName').value, 
+                desc: document.getElementById('mDesc').value,
+                start: document.getElementById('mStart').value, 
+                end: document.getElementById('mEnd').value, 
+                owner: document.getElementById('mOwner').value, 
+                importance: document.getElementById('mImp').value, 
+                status: document.getElementById('mStat').value, 
+                archived: false,
+                logs: id ? (tasks.find(x=>x.id==id).logs || []) : [{type:'system', msg:'Task Initialized'}]
+            };
+            if(!id) tasks.unshift(obj); else { const idx = tasks.findIndex(x => x.id == id); tasks[idx] = obj; }
+            save(); closeModal();
         }
 
+        function deleteTask(id) { if(confirm("Permanently delete this task?")) { tasks = tasks.filter(t => t.id !== id); save(); } }
+        function toggleArchive(id, s) { const t = tasks.find(x => x.id == id); t.archived = s; t.closedOn = new Date().toLocaleDateString(); save(); }
+        function switchView(v, el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); document.getElementById('view-'+v).style.display='block'; renderActive(); }
         function drag(e, id) { e.dataTransfer.setData("text", id); }
+        function drop(e, stat) { const id = e.dataTransfer.getData("text"), t = tasks.find(x => x.id == id); t.status = stat; save(); }
         function allow(e) { e.preventDefault(); }
-        async function drop(e, stat) { 
-            const id = e.dataTransfer.getData("text");
-            const t = tasks.find(x => x.id == id);
-            if(t && t.status !== stat){
-                const logs = t.logs || [];
-                logs.push({msg: `Moved to ${stat}`, time: getTS(), type: 'system'});
-                await db.collection("tasks").doc(id).update({ status: stat, logs: logs });
-            }
-        }
+        function hDrag(e, id) { dragSrc = id; }
+        function hDrop(e, targetId) { e.preventDefault(); const from = tasks.findIndex(t => t.id === dragSrc), to = tasks.findIndex(t => t.id === targetId); const [m] = tasks.splice(from, 1); tasks.splice(to, 0, m); save(); }
 
-        // Keep timeline & stats logic (simplified for length)
-        function renderTimeline() { /* Similar to previous, but using 'tasks' array */ }
-        function renderStats() { /* Similar to previous, but using 'tasks' array */ }
-        
-        lucide.createIcons();
+        renderActive();
     </script>
 </body>
 </html>
