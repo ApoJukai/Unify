@@ -11,24 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Variables: These are like "nicknames" for colors we use often */
         :root {
-            --primary: #6366F1; /* Purple */
-            --primary-dark: #4338CA; 
-            --accent: #10B981;  /* Green */
-            --bg-main: #F8FAFC; 
-            --bg-sidebar: #1E293B; 
-            --text-main: #1E293B;
-            --text-muted: #64748B; 
-            --border: #E2E8F0; 
-            --white: #FFFFFF;
-            --p-high: #EF4444; /* Red */
-            --p-med: #F59E0B;  /* Orange */
-            --p-low: #94A3B8;  /* Gray */
-            --today: #FF4D4D; 
-            --danger: #F43F5E;
-            
-            /* Status Specific Colors */
+            --primary: #6366F1; --primary-dark: #4338CA; --accent: #10B981;
+            --bg-main: #F8FAFC; --bg-sidebar: #1E293B; --text-main: #1E293B;
+            --text-muted: #64748B; --border: #E2E8F0; --white: #FFFFFF;
+            --p-high: #EF4444; --p-med: #F59E0B; --p-low: #94A3B8;
+            --today: #FF4D4D; --danger: #F43F5E;
             --status-bg-backlog: #F1F5F9; --status-txt-backlog: #475569;
             --status-bg-progress: #EEF2FF; --status-txt-progress: #6366F1;
             --status-bg-done: #D1FAE5; --status-txt-done: #059669;
@@ -49,7 +37,7 @@
         header { padding: 20px 40px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .view-section { display: none; padding: 30px 40px; overflow-y: auto; flex: 1; }
 
-        /* Timeline Styles */
+        /* Timeline Fixes */
         .timeline-wrapper { display: flex; border: 1px solid var(--border); border-radius: 16px; height: 500px; background: white; overflow: hidden; }
         .t-sidebar { width: 220px; border-right: 1px solid var(--border); background: #F8FAFC; flex-shrink: 0; }
         .t-grid { flex: 1; overflow-x: auto; position: relative; }
@@ -58,19 +46,12 @@
         .t-bar { position: absolute; height: 32px; top: 9px; border-radius: 8px; color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-space: nowrap; z-index: 2; }
         .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today); z-index: 5; pointer-events: none; }
 
-        /* Analytics Stabilization */
-        .grid-insights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-        .chart-container { background: var(--white); padding: 25px; border-radius: 24px; border: 1px solid var(--border); position: relative; height: 320px; }
-
         /* Modals & Tables */
         .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-card { background: white; width: 1000px; border-radius: 28px; display: grid; grid-template-columns: 1fr 380px; height: 85vh; overflow: hidden; }
-        
         .list-table { width: 100%; border-collapse: collapse; }
         .list-table th { background: #F8FAFC; text-align: left; padding: 18px 20px; font-size: 11px; font-weight: 800; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; }
         .list-row td { padding: 18px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        
-        /* Badges */
         .priority-badge { font-family: 'Montserrat'; font-size: 10px; padding: 5px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
         .p-high { background: #FEE2E2; color: #B91C1C; }
         .p-medium { background: #FEF3C7; color: #B45309; }
@@ -86,8 +67,6 @@
 
         /* Board Cards */
         .task-card { background: white; padding: 16px; border-radius: 16px; margin-bottom: 12px; cursor: grab; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-
-        /* Notes Bubbles */
         .sms-bubble { padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; line-height: 1.4; max-width: 90%; }
         .sms-user { background: var(--primary); color: white; align-self: flex-end; }
         .sms-system { background: #E2E8F0; color: var(--text-main); align-self: flex-start; }
@@ -182,10 +161,9 @@
                     </div>
                 </form>
             </div>
-            
             <div style="background:#F8FAFC; padding:25px; border-left:1px solid var(--border); display:flex; flex-direction:column;">
                 <h4 style="font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:15px;">SYSTEM LOG & NOTES</h4>
-                <div id="chatContainer" style="flex:1; overflow-y:auto; padding-right:5px;"></div>
+                <div id="chatContainer" style="flex:1; overflow-y:auto;"></div>
                 <div style="display:flex; gap:8px; margin-top:10px;">
                     <input type="text" id="chatInput" placeholder="Add note..." onkeypress="if(event.key==='Enter') addNote()" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:8px;">
                     <button onclick="addNote()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:8px; font-weight:800; cursor:pointer;">POST</button>
@@ -195,88 +173,45 @@
     </div>
 
     <script>
-        // FIREBASE SETUP
-        const firebaseConfig = {
-            apiKey: "API_KEY",
-            authDomain: "PROJECT.firebaseapp.com",
-            databaseURL: "https://PROJECT.firebaseio.com",
-            projectId: "PROJECT_ID",
-            storageBucket: "PROJECT.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyA1lEjH3Fh747RdRQ-2emPnv_aJqb2Zywo",
+  authDomain: "plantask-collaborative.firebaseapp.com",
+  projectId: "plantask-collaborative",
+  storageBucket: "plantask-collaborative.firebasestorage.app",
+  messagingSenderId: "75156468250",
+  appId: "1:75156468250:web:d5a61c2c78f9195be117a3",
+  measurementId: "G-D4FMXZLX7N" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        let tasks = [];
-        let activeCharts = {};
-        let dragSrc = null;
+        let tasks = []; let activeCharts = {}; let dragSrc = null;
 
         db.ref('tasks').on('value', snap => {
             tasks = snap.val() ? Object.values(snap.val()) : [];
             renderAll();
         });
 
-        function saveTask(obj) { db.ref('tasks/' + obj.id).set(obj); }
-        function hardDelete(id) { if(confirm("Permanently delete this task?")) db.ref('tasks/' + id).remove(); }
+        function saveTask(obj) { db.ref('tasks/' + obj.id).set(obj).then(() => renderAll()); }
+        function hardDelete(id) { if(confirm("Permanently delete?")) db.ref('tasks/' + id).remove(); }
         function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
-
-        // Logic to get the right CSS class for colors based on status
-        function getStatusClass(status) {
-            if(status === 'Finished') return 'stat-finished';
-            if(status === 'In-Progress') return 'stat-in-progress';
-            return 'stat-not-started';
-        }
+        function getStatusClass(status) { if(status === 'Finished') return 'stat-finished'; if(status === 'In-Progress') return 'stat-in-progress'; return 'stat-not-started'; }
 
         function renderAll() {
             const q = document.getElementById('globalSearch').value.toLowerCase();
             const sort = document.getElementById('sortBy').value;
             let filtered = tasks.filter(t => !t.archived && (t.name.toLowerCase().includes(q)));
-            
-            if(sort === 'priority') {
-                const map = {High:1, Medium:2, Low:3};
-                filtered.sort((a,b) => map[a.importance] - map[b.importance]);
-            } else if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+            if(sort === 'priority') { const map = {High:1, Medium:2, Low:3}; filtered.sort((a,b) => map[a.importance] - map[b.importance]); } 
+            else if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
 
-            // Board View
             const cols = {'Not Started':'board-notstarted','In-Progress':'board-inprogress','Finished':'board-finished'};
             Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
             filtered.forEach(t => {
                 const color = t.importance === 'High' ? 'var(--p-high)' : t.importance === 'Medium' ? 'var(--p-med)' : 'var(--p-low)';
-                document.getElementById(cols[t.status]).innerHTML += `
-                    <div class="task-card" onclick="openModal(${t.id})" draggable="true" ondragstart="drag(event, ${t.id})" style="border-top:4px solid ${color};">
-                        <div style="font-weight:800; font-size:14px; margin-bottom:6px;">${t.name}</div>
-                        <div style="font-size:11px; color:var(--text-muted); font-weight:700;">${(t.owner||'NO OWNER').toUpperCase()}</div>
-                    </div>`;
+                document.getElementById(cols[t.status]).innerHTML += `<div class="task-card" onclick="openModal(${t.id})" draggable="true" ondragstart="drag(event, ${t.id})" style="border-top:4px solid ${color};"><div style="font-weight:800; font-size:14px; margin-bottom:6px;">${t.name}</div><div style="font-size:11px; color:var(--text-muted); font-weight:700;">${(t.owner||'NO OWNER').toUpperCase()}</div></div>`;
             });
 
-            // List View
-            document.getElementById('list-tbody').innerHTML = filtered.map(t => `
-                <tr class="list-row" draggable="true" ondragstart="hDrag(event, ${t.id})" ondrop="hDrop(event, ${t.id})" ondragover="event.preventDefault()">
-                    <td><i data-lucide="grip-vertical" size="14"></i></td>
-                    <td><div style="font-weight:800;">${t.name}</div><div style="font-size:11px; color:var(--text-muted);">${t.desc||''}</div></td>
-                    <td style="font-size:12px; font-weight:800;">${(t.owner||'-').toUpperCase()}</td>
-                    <td><span class="priority-badge p-${t.importance.toLowerCase()}">${t.importance}</span></td>
-                    <td><span class="status-badge ${getStatusClass(t.status)}">${t.status}</span></td>
-                    <td style="text-align:right">
-                        <button class="btn-icon" onclick="openModal(${t.id})"><i data-lucide="edit-3" size="14"></i></button>
-                        <button class="btn-icon" onclick="toggleArchive(${t.id}, true)"><i data-lucide="package" size="14"></i></button>
-                    </td>
-                </tr>`).join('');
+            document.getElementById('list-tbody').innerHTML = filtered.map(t => `<tr class="list-row" draggable="true" ondragstart="hDrag(event, ${t.id})" ondrop="hDrop(event, ${t.id})" ondragover="event.preventDefault()"><td><i data-lucide="grip-vertical" size="14"></i></td><td><div style="font-weight:800;">${t.name}</div><div style="font-size:11px; color:var(--text-muted);">${t.desc||''}</div></td><td style="font-size:12px; font-weight:800;">${(t.owner||'-').toUpperCase()}</td><td><span class="priority-badge p-${t.importance.toLowerCase()}">${t.importance}</span></td><td><span class="status-badge ${getStatusClass(t.status)}">${t.status}</span></td><td style="text-align:right"><button class="btn-icon" onclick="openModal(${t.id})"><i data-lucide="edit-3" size="14"></i></button><button class="btn-icon" onclick="toggleArchive(${t.id}, true)"><i data-lucide="package" size="14"></i></button></td></tr>`).join('');
+            document.getElementById('archive-tbody').innerHTML = tasks.filter(t => t.archived).map(t => `<tr class="list-row"><td><b>${t.name}</b></td><td>${t.owner}</td><td>${t.closedOn}</td><td style="text-align:right"><button class="btn-icon" onclick="toggleArchive(${t.id}, false)"><i data-lucide="rotate-ccw" size="14"></i></button><button class="btn-icon" style="color:red" onclick="hardDelete(${t.id})"><i data-lucide="trash-2" size="14"></i></button></td></tr>`).join('');
 
-            // Archive
-            document.getElementById('archive-tbody').innerHTML = tasks.filter(t => t.archived).map(t => `
-                <tr class="list-row">
-                    <td><b>${t.name}</b></td><td>${t.owner}</td><td>${t.closedOn}</td>
-                    <td style="text-align:right">
-                        <button class="btn-icon" onclick="toggleArchive(${t.id}, false)"><i data-lucide="rotate-ccw" size="14"></i></button>
-                        <button class="btn-icon" style="color:red" onclick="hardDelete(${t.id})"><i data-lucide="trash-2" size="14"></i></button>
-                    </td>
-                </tr>`).join('');
-
-            renderTimeline();
-            renderStats();
-            lucide.createIcons();
+            renderTimeline(); renderStats(); lucide.createIcons();
         }
 
         function renderTimeline() {
@@ -284,56 +219,31 @@
             side.innerHTML = ''; bars.innerHTML = ''; heads.innerHTML = '';
             const startBase = new Date(); startBase.setDate(startBase.getDate()-5); startBase.setHours(0,0,0,0);
             const dayW = 80; const today = new Date(); today.setHours(0,0,0,0);
-
             for(let i=0; i<30; i++) {
-                let d = new Date(startBase); d.setDate(d.getDate()+i);
-                const isToday = d.getTime() === today.getTime();
+                let d = new Date(startBase); d.setDate(d.getDate()+i); const isToday = d.getTime() === today.getTime();
                 heads.innerHTML += `<div style="width:${dayW}px; text-align:center; height:50px; display:flex; flex-direction:column; justify-content:center; border-right:1px solid #F1F5F9; ${isToday?'color:var(--today);font-weight:900':''}"><span>${d.getDate()}</span><span style="font-size:8px;">${d.toLocaleDateString([],{month:'short'})}</span></div>`;
-                if(isToday) {
-                    const line = document.createElement('div'); line.className = 'today-line';
-                    line.style.left = (i * dayW + dayW/2) + 'px'; bars.appendChild(line);
-                }
+                if(isToday) { const line = document.createElement('div'); line.className = 'today-line'; line.style.left = (i * dayW + dayW/2) + 'px'; bars.appendChild(line); }
             }
-
             tasks.filter(t => !t.archived && t.start && t.end).forEach(t => {
                 side.innerHTML += `<div class="t-row">${t.name}</div>`;
                 const sDate = new Date(t.start + "T00:00:00"), eDate = new Date(t.end + "T23:59:59");
                 const offset = Math.floor((sDate - startBase) / 864e5), dur = Math.ceil((eDate - sDate) / 864e5);
                 const row = document.createElement('div'); row.style.height = '50px'; row.style.borderBottom = '1px solid #F1F5F9'; row.style.width = (30 * dayW) + 'px';
-                const bar = document.createElement('div'); bar.className = 't-bar';
-                bar.style.left = (offset * dayW) + 'px'; bar.style.width = (dur * dayW) + 'px';
-                
-                // Color coding for timeline bars
-                if(t.status === 'Finished') bar.style.background = 'var(--accent)';
-                else if(t.status === 'In-Progress') bar.style.background = 'var(--primary)';
-                else bar.style.background = '#94A3B8';
-
-                bar.innerText = t.name; bar.onclick = () => openModal(t.id);
-                row.appendChild(bar); bars.appendChild(row);
+                const bar = document.createElement('div'); bar.className = 't-bar'; bar.style.left = (offset * dayW) + 'px'; bar.style.width = (dur * dayW) + 'px';
+                bar.style.background = t.status === 'Finished' ? 'var(--accent)' : t.status === 'In-Progress' ? 'var(--primary)' : '#94A3B8';
+                bar.innerText = t.name; bar.onclick = () => openModal(t.id); row.appendChild(bar); bars.appendChild(row);
             });
         }
 
         function renderStats() {
             const done = tasks.filter(t=>t.status==='Finished').length;
-            document.getElementById('stat-cards').innerHTML = `
-                <div class="stat-box"><h4>Productivity</h4><div style="font-size:24px; font-weight:800; color:var(--accent)">${Math.round(done/(tasks.length||1)*100)}%</div></div>
-                <div class="stat-box"><h4>Active</h4><div style="font-size:24px; font-weight:800; color:var(--primary)">${tasks.filter(t=>t.status==='In-Progress').length}</div></div>
-                <div class="stat-box"><h4>Backlog</h4><div style="font-size:24px; font-weight:800; color:var(--text-muted)">${tasks.filter(t=>t.status==='Not Started').length}</div></div>
-                <div class="stat-box"><h4>High Risk</h4><div style="font-size:24px; font-weight:800; color:var(--p-high)">${tasks.filter(t=>t.importance==='High').length}</div></div>`;
-
-            const init = (id, type, labels, data, colors) => {
-                if(activeCharts[id]) activeCharts[id].destroy();
-                activeCharts[id] = new Chart(document.getElementById(id), {
-                    type, data: { labels, datasets: [{ data, backgroundColor: colors, fill: false }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: id.replace('c-', '').toUpperCase() } } }
-                });
-            };
+            document.getElementById('stat-cards').innerHTML = `<div class="stat-box"><h4>Productivity</h4><div style="font-size:24px; font-weight:800; color:var(--accent)">${Math.round(done/(tasks.length||1)*100)}%</div></div><div class="stat-box"><h4>Active</h4><div style="font-size:24px; font-weight:800; color:var(--primary)">${tasks.filter(t=>t.status==='In-Progress').length}</div></div><div class="stat-box"><h4>Backlog</h4><div style="font-size:24px; font-weight:800; color:var(--text-muted)">${tasks.filter(t=>t.status==='Not Started').length}</div></div><div class="stat-box"><h4>High Risk</h4><div style="font-size:24px; font-weight:800; color:var(--p-high)">${tasks.filter(t=>t.importance==='High').length}</div></div>`;
+            const init = (id, type, labels, data, colors) => { if(activeCharts[id]) activeCharts[id].destroy(); activeCharts[id] = new Chart(document.getElementById(id), { type, data: { labels, datasets: [{ data, backgroundColor: colors, fill: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: id.replace('c-', '').toUpperCase() } } } }); };
             init('c-velocity', 'line', ['W1','W2','W3','W4'], [2,5,3,done], '#6366F1');
             init('c-status', 'doughnut', ['Done','Active','Backlog'], [done, tasks.filter(t=>t.status==='In-Progress').length, tasks.filter(t=>t.status==='Not Started').length], ['#10B981','#6366F1','#CBD5E1']);
             const owners = {}; tasks.forEach(t => { const o = t.owner || 'Unassigned'; owners[o] = (owners[o]||0)+1; });
             init('c-workload', 'radar', Object.keys(owners), Object.values(owners), 'rgba(99, 102, 241, 0.2)');
-            const p = {High:0, Medium:0, Low:0}; tasks.forEach(t => p[t.importance]++);
-            init('c-priority', 'polarArea', ['High','Med','Low'], [p.High, p.Medium, p.Low], ['#EF4444','#F59E0B','#94A3B8']);
+            const p = {High:0, Medium:0, Low:0}; tasks.forEach(t => p[t.importance]++); init('c-priority', 'polarArea', ['High','Med','Low'], [p.High, p.Medium, p.Low], ['#EF4444','#F59E0B','#94A3B8']);
         }
 
         function openModal(id = null) {
@@ -352,8 +262,9 @@
 
         document.getElementById('taskForm').onsubmit = e => {
             e.preventDefault();
-            const id = document.getElementById('editId').value;
-            const t = tasks.find(x => x.id == id) || { id: parseInt(id), logs: [{type:'system',msg:'Initialized'}] };
+            const id = parseInt(document.getElementById('editId').value);
+            let t = tasks.find(x => x.id === id);
+            if(!t) { t = { id: id, logs: [{type:'system',msg:'Created'}] }; tasks.push(t); }
             t.name = document.getElementById('mName').value;
             t.desc = document.getElementById('mDesc').value;
             t.start = document.getElementById('mStart').value;
@@ -366,23 +277,19 @@
         };
 
         function addNote() {
-            const id = document.getElementById('editId').value, input = document.getElementById('chatInput');
+            const id = parseInt(document.getElementById('editId').value), input = document.getElementById('chatInput');
             if(!id || !input.value.trim()) return;
-            const t = tasks.find(x => x.id == id);
-            if(!t) return; 
-            if(!t.logs) t.logs = [];
-            t.logs.push({ type:'user', msg:input.value });
-            input.value = ''; 
-            saveTask(t); 
-            // Refresh modal to show the new note immediately
+            const t = tasks.find(x => x.id === id); if(!t) return;
+            if(!t.logs) t.logs = []; t.logs.push({ type:'user', msg:input.value });
+            input.value = ''; saveTask(t);
             document.getElementById('chatContainer').innerHTML = t.logs.map(l => `<div class="sms-bubble ${l.type==='user'?'sms-user':'sms-system'}">${l.msg}</div>`).join('');
             document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
         }
 
-        function toggleArchive(id, s) { const t = tasks.find(x => x.id == id); t.archived = s; t.closedOn = s ? new Date().toLocaleDateString() : null; saveTask(t); }
+        function toggleArchive(id, s) { const t = tasks.find(x => x.id == id); if(t){ t.archived = s; t.closedOn = s ? new Date().toLocaleDateString() : null; saveTask(t); } }
         function switchView(v, el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); document.getElementById('view-'+v).style.display='block'; }
         function drag(e, id) { e.dataTransfer.setData("text", id); }
-        function drop(e, stat) { const id = e.dataTransfer.getData("text"), t = tasks.find(x => x.id == id); t.status = stat; saveTask(t); }
+        function drop(e, stat) { const id = e.dataTransfer.getData("text"), t = tasks.find(x => x.id == id); if(t){ t.status = stat; saveTask(t); } }
         function allow(e) { e.preventDefault(); }
         function hDrag(e, id) { dragSrc = id; }
         function hDrop(e, targetId) { e.preventDefault(); const from = tasks.findIndex(t => t.id === dragSrc), to = tasks.findIndex(t => t.id === targetId); const temp = tasks[from]; tasks.splice(from, 1); tasks.splice(to, 0, temp); db.ref('tasks').set(tasks.reduce((a,v)=>({ ...a, [v.id]:v }), {})); }
