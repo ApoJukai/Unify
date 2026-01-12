@@ -44,7 +44,7 @@
         .kanban-col { background: #f8f9fa; padding: 20px; border-radius: 24px; min-height: 60vh; }
         .task-card { background: #fff; padding: 18px; border-radius: 16px; margin-bottom: 15px; cursor: grab; border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* List View */
+        /* List Table */
         .list-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; table-layout: fixed; }
         .list-table th { text-align: left; padding: 10px 20px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .list-row td { background: #fcfaff; padding: 15px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); vertical-align: middle; }
@@ -54,6 +54,7 @@
         .timeline-controls { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #f8f9fa; padding: 10px 15px; border-radius: 15px; border: 1px solid var(--border); }
         .range-pill { padding: 6px 14px; border-radius: 20px; background: #fff; border: 1px solid var(--border); font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
         .range-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .custom-range-inputs { display: none; gap: 8px; align-items: center; }
         
         .timeline-container { display: flex; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; height: 500px; background: #fff; }
         .t-sidebar { width: 300px; border-right: 1px solid var(--border); background: #fbfaff; flex-shrink: 0; }
@@ -62,19 +63,20 @@
         .t-bar { position: absolute; height: 32px; border-radius: 16px; color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-space: nowrap; }
         .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today-line); z-index: 10; pointer-events: none; }
 
-        /* Growth Stats Special Styling - FIXED HEIGHTS */
+        /* Growth Stats */
         .chart-card { background: white; border: 1px solid var(--border); border-radius: 24px; padding: 20px; height: 320px; display: flex; flex-direction: column; position: relative; }
         .chart-card h4 { margin-bottom: 15px; font-family: 'Montserrat'; font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
-        .chart-wrapper { flex: 1; position: relative; min-height: 0; } /* Crucial for Chart.js in flexbox */
+        .chart-wrapper { flex: 1; position: relative; min-height: 0; }
 
-        /* Utility Styles */
-        .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 12px; }
+        /* Indicators */
+        .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 12px; transition: transform 0.3s ease; }
         .pulse-high { animation: dot-pulse 1.5s infinite; }
         @keyframes dot-pulse {
             0% { box-shadow: 0 0 0 0px rgba(255, 68, 68, 0.4); }
             70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0px rgba(255, 68, 68, 0); }
         }
+        
         .pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
         .pill-todo { background: #e2e8f0; color: #475569; }
         .pill-progress { background: #fff7ed; color: #c2410c; }
@@ -84,6 +86,9 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(90, 62, 186, 0.4); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-card { background: #fff; width: 1000px; border-radius: 30px; display: grid; grid-template-columns: 1fr 380px; height: 85vh; overflow: hidden; }
         .chat-container { flex: 1; overflow-y: auto; padding: 15px; background: #f3f0ff; border-radius: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .sms-bubble { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 12px; background: #fff; align-self: flex-start; line-height: 1.4; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .sms-mine { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .log-entry { font-size: 10px; color: var(--text-muted); text-align: center; margin: 5px 0; font-style: italic; opacity: 0.8; }
     </style>
 </head>
 <body onmousedown="checkClose(event)">
@@ -102,8 +107,7 @@
             <div class="nav-item" onclick="switchView('archive', this)"><i data-lucide="archive-restore"></i> Harvested</div>
         </nav>
         <div class="sidebar-footer">
-            <div id="sync-status">Status: Local Mode</div>
-            <button class="data-btn" onclick="openGithubConfig()"><i data-lucide="github"></i> GitHub Sync</button>
+            <div id="sync-status">Status: Connecting...</div>
             <button class="data-btn" onclick="exportTasks()"><i data-lucide="file-down"></i> Local Backup</button>
         </div>
     </aside>
@@ -158,6 +162,11 @@
                 <button class="range-pill active" id="btn-month" onclick="setTimelineRange('month')">Monthly</button>
                 <button class="range-pill" id="btn-year" onclick="setTimelineRange('year')">Yearly</button>
                 <button class="range-pill" id="btn-custom" onclick="setTimelineRange('custom')">Custom</button>
+                <div class="custom-range-inputs" id="custom-date-box">
+                    <input type="date" id="t-start-custom" onchange="renderTimeline()" style="padding:5px; border-radius:8px; border:1px solid var(--border)">
+                    <span style="font-size: 10px;">to</span>
+                    <input type="date" id="t-end-custom" onchange="renderTimeline()" style="padding:5px; border-radius:8px; border:1px solid var(--border)">
+                </div>
                 <button onclick="jumpToToday()" class="data-btn" style="width:auto; margin-left:auto; background:var(--primary); color:white;">Today</button>
             </div>
             <div class="timeline-container">
@@ -171,21 +180,19 @@
 
         <div id="view-analytics" class="view-section">
             <div id="insight-box" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;"></div>
-            
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
                 <div class="chart-card">
                     <h4>Status Distribution</h4>
                     <div class="chart-wrapper"><canvas id="c-status"></canvas></div>
                 </div>
                 <div class="chart-card">
-                    <h4>Growth Trends (Monthly)</h4>
+                    <h4>Growth Trends</h4>
                     <div class="chart-wrapper"><canvas id="c-timeline"></canvas></div>
                 </div>
             </div>
-            
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 25px;">
                 <div class="chart-card">
-                    <h4>Owner Distribution (Bloomed)</h4>
+                    <h4>Owner Performance (Bloomed)</h4>
                     <div class="chart-wrapper"><canvas id="c-owners"></canvas></div>
                 </div>
                 <div class="chart-card">
@@ -238,91 +245,85 @@
         </div>
     </div>
 
-    <div class="modal" id="githubModal">
-        <div class="modal-card" style="grid-template-columns: 1fr; width: 400px; height: auto; padding: 30px;">
-            <h3>GitHub Cloud Sync</h3>
-            <p style="font-size:12px; color:var(--text-muted); margin: 10px 0 20px;">Sync your tasks.json with your repository.</p>
-            <input type="password" id="ghToken" placeholder="Personal Access Token" style="width:100%; padding:10px; margin-bottom:10px;">
-            <input type="text" id="ghRepo" placeholder="username/repo-name" style="width:100%; padding:10px; margin-bottom:10px;">
-            <input type="text" id="ghPath" value="tasks.json" style="width:100%; padding:10px; margin-bottom:20px;">
-            <div style="display:flex; gap:10px">
-                <button onclick="closeGithubModal()" style="flex:1; cursor:pointer;">Cancel</button>
-                <button onclick="saveGithubConfig()" style="flex:1; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">Connect</button>
-            </div>
-        </div>
-    </div>
-
     <script>
+        const GH_TOKEN = "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";
+        const GH_REPO = "ApoJukai/Unify";
+        const GH_PATH = "tasks.json";
+
         let tasks = [];
-        let config = JSON.parse(localStorage.getItem('GH_CONFIG')) || null;
         let currentFileSha = null;
         let charts = {};
         let dateSortDir = 'none'; 
         let draggedIdx = null;
         let timelineMode = 'month';
 
-        // --- Data Persistence ---
         async function loadData() {
-            if (config) {
-                updateStatus("Syncing...");
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${config.path}`, {
-                        headers: { 'Authorization': `token ${config.token}` }
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        currentFileSha = data.sha;
-                        tasks = JSON.parse(atob(data.content));
-                        updateStatus("Cloud Synced");
-                    }
-                } catch (e) { updateStatus("Cloud Error"); }
-            } else {
-                tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
-            }
+            updateStatus("Syncing...");
+            try {
+                const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`, {
+                    headers: { 'Authorization': `token ${GH_TOKEN}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentFileSha = data.sha;
+                    tasks = JSON.parse(atob(data.content));
+                    updateStatus("Cloud Synced");
+                } else {
+                    tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+                    updateStatus("Local Mode");
+                }
+            } catch (e) { updateStatus("Error"); tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || []; }
             renderActive();
         }
 
         async function save() {
             renderActive();
-            if (config) {
-                updateStatus("Saving...");
-                const content = btoa(JSON.stringify(tasks, null, 2));
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${config.path}`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `token ${config.token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: "Update via PlanTask", content: content, sha: currentFileSha })
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        currentFileSha = data.content.sha;
-                        updateStatus("Cloud Saved");
-                    }
-                } catch (e) { updateStatus("Save Error"); }
-            } else {
-                localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
-            }
+            localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
+            const content = btoa(JSON.stringify(tasks, null, 2));
+            try {
+                const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${GH_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Update", content: content, sha: currentFileSha })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentFileSha = data.content.sha;
+                    updateStatus("Cloud Saved");
+                }
+            } catch (e) { updateStatus("Cloud Error"); }
         }
 
         function updateStatus(msg) { document.getElementById('sync-status').innerText = `Status: ${msg}`; }
 
-        // --- Drag & Drop ---
+        function switchView(v, el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+            document.getElementById('view-' + v).style.display = 'block';
+            document.getElementById('view-title').innerText = el.innerText;
+            renderActive();
+        }
+
         function allow(e) { e.preventDefault(); }
         function drag(e, id) { e.dataTransfer.setData("text", id); }
         function drop(e) {
             e.preventDefault();
             const id = e.dataTransfer.getData("text");
             const newStatus = e.currentTarget.id;
-            tasks = tasks.map(t => t.id == id ? {...t, status: newStatus} : t);
+            const t = tasks.find(x => x.id == id);
+            if(t.status !== newStatus) logAction(t, `Moved to ${newStatus}`);
+            t.status = newStatus;
             save();
         }
 
-        function dragList(e, id) {
-            if (dateSortDir !== 'none') return;
-            draggedIdx = tasks.findIndex(t => t.id == id);
-            e.target.classList.add('dragging');
+        function toggleDateSort() {
+            dateSortDir = (dateSortDir === 'none') ? 'asc' : (dateSortDir === 'asc' ? 'desc' : 'none');
+            document.getElementById('sortDirText').innerText = dateSortDir.toUpperCase();
+            renderActive();
         }
 
+        function dragList(e, id) { if (dateSortDir !== 'none') return; draggedIdx = tasks.findIndex(t => t.id == id); e.target.classList.add('dragging'); }
         function dropList(e, targetId) {
             e.preventDefault();
             const targetIdx = tasks.findIndex(t => t.id == targetId);
@@ -334,109 +335,34 @@
             draggedIdx = null;
         }
 
-        // --- Renders ---
-        function switchView(v, el) {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.getElementById('view-' + v).style.display = 'block';
-            document.getElementById('view-title').innerText = el.innerText;
-            renderActive();
-        }
-
-        function toggleDateSort() {
-            if (dateSortDir === 'none') dateSortDir = 'asc';
-            else if (dateSortDir === 'asc') dateSortDir = 'desc';
-            else dateSortDir = 'none';
-            document.getElementById('sortDirText').innerText = dateSortDir === 'none' ? 'Manual' : dateSortDir.toUpperCase();
-            renderActive();
-        }
-
-        function getProcessedTasks() {
-            let filtered = tasks.filter(t => {
-                const q = document.getElementById('globalSearch').value.toLowerCase();
-                const matchesSearch = t.name.toLowerCase().includes(q) || (t.owner && t.owner.toLowerCase().includes(q));
-                const pFilter = document.getElementById('priorityFilter').value;
-                const matchesPriority = pFilter === 'All' || t.importance === pFilter;
-                return matchesSearch && matchesPriority;
-            });
-            if (dateSortDir !== 'none') {
-                filtered.sort((a, b) => {
-                    const dA = a.end ? new Date(a.end) : new Date('9999');
-                    const dB = b.end ? new Date(b.end) : new Date('9999');
-                    return dateSortDir === 'asc' ? dA - dB : dB - dA;
-                });
-            }
-            return filtered;
-        }
-
-        function renderBoard() {
-            const cols = {'Not Started': 'board-notstarted', 'In-Progress': 'board-inprogress', 'Finished': 'board-finished'};
-            Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
-            tasks.filter(t => !t.archived).forEach(t => {
-                const color = t.importance === 'High' ? 'var(--p-high)' : 'var(--primary)';
-                document.getElementById(cols[t.status]).innerHTML += `
-                    <div class="task-card" draggable="true" ondragstart="drag(event, ${t.id})" onclick="openModal(${t.id})" style="border-left-color:${color}">
-                        <div style="font-weight:800; font-size:13px">${t.name}</div>
-                        <div style="font-size:10px; color:var(--text-muted); margin-top:5px">${t.owner || 'Unassigned'}</div>
-                    </div>`;
-            });
-        }
-
-        function renderList() {
-            const filtered = getProcessedTasks();
-            const createRow = (t) => `
-                <tr class="list-row" draggable="${dateSortDir === 'none'}" ondragstart="dragList(event, ${t.id})" ondragover="allow(event)" ondrop="dropList(event, ${t.id})">
-                    <td><div style="font-weight:700;"><span class="priority-dot ${t.importance==='High'?'pulse-high':''}" style="background:${t.importance==='High'?'var(--p-high)':(t.importance==='Medium'?'var(--p-med)':'var(--p-low)')}"></span>${t.name}</div></td>
-                    <td>${t.owner || '-'}</td>
-                    <td style="font-size:11px;">${t.start || '...'} → ${t.end || '...'}</td>
-                    <td><span class="pill ${t.status==='Finished'?'pill-done':(t.status==='In-Progress'?'pill-progress':'pill-todo')}">${t.status}</span></td>
-                    <td style="text-align:right">
-                        <div style="display:flex; gap:10px; justify-content:flex-end">
-                            <button onclick="openModal(${t.id})" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="edit-3" size="16"></i></button>
-                            ${!t.archived && t.status === 'Finished' ? `<button onclick="toggleArchive(${t.id}, true)" style="border:none; background:none; cursor:pointer; color:var(--accent)"><i data-lucide="package" size="16"></i></button>` : ''}
-                            <button onclick="deleteTask(${t.id})" style="border:none; background:none; cursor:pointer; color:#ff4444"><i data-lucide="trash-2" size="16"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-
-            document.getElementById('list-tbody').innerHTML = filtered.filter(t => !t.archived).map(createRow).join('');
-            document.getElementById('archive-tbody').innerHTML = filtered.filter(t => t.archived).map(createRow).join('');
-            lucide.createIcons();
-        }
-
-        // --- Operations ---
-        function toggleArchive(id, state) { tasks = tasks.map(t => t.id == id ? {...t, archived: state} : t); save(); }
-        function deleteTask(id) { if(confirm("Permanently delete?")) { tasks = tasks.filter(t => t.id != id); save(); } }
-
-        // --- Timeline ---
         function setTimelineRange(mode) {
             timelineMode = mode;
             document.querySelectorAll('.range-pill').forEach(p => p.classList.remove('active'));
             document.getElementById('btn-' + mode).classList.add('active');
+            document.getElementById('custom-date-box').style.display = (mode === 'custom') ? 'flex' : 'none';
             renderTimeline();
         }
 
-        function jumpToToday() {
-            const container = document.getElementById('t-scroll-box');
-            const todayLine = document.querySelector('.today-line');
-            if(todayLine) container.scrollLeft = todayLine.offsetLeft - 100;
-        }
+        function jumpToToday() { const el = document.querySelector('.today-line'); if(el) el.scrollIntoView({ behavior: 'smooth', inline: 'center' }); }
 
         function renderTimeline() {
             const head = document.getElementById('t-headers'), bars = document.getElementById('t-bars-container'), side = document.getElementById('t-side-items');
             head.innerHTML = ''; bars.innerHTML = ''; side.innerHTML = '';
             let startDate = new Date(); startDate.setHours(0,0,0,0);
-            let days = timelineMode === 'week' ? 7 : (timelineMode === 'year' ? 365 : 30);
+            let days = 30;
+            if (timelineMode === 'week') days = 7;
+            else if (timelineMode === 'year') days = 365;
+            else if (timelineMode === 'custom') {
+                const s = document.getElementById('t-start-custom').value, e = document.getElementById('t-end-custom').value;
+                if (s && e) { startDate = new Date(s); days = Math.max(1, Math.round((new Date(e) - startDate) / 864e5) + 1); }
+            }
             const dayW = timelineMode === 'year' ? 30 : 80;
-
             for(let i=0; i<days; i++) {
                 const d = new Date(startDate); d.setDate(d.getDate()+i);
                 const isToday = d.toDateString() === new Date().toDateString();
                 head.innerHTML += `<div class="t-day" style="width:${dayW}px; ${isToday?'background:#fff4f4; color:var(--today-line)':''}">${d.toLocaleDateString([], {month:'short', day:'numeric'})}</div>`;
                 if(isToday) bars.innerHTML += `<div class="today-line" style="left:${i*dayW}px"></div>`;
             }
-
             tasks.filter(t => !t.archived && t.start && t.end).forEach((t, i) => {
                 const start = new Date(t.start), end = new Date(t.end);
                 const offset = (start - startDate) / 864e5, duration = (end - start) / 864e5 + 1;
@@ -447,102 +373,129 @@
             });
         }
 
-        // --- FIXED ANALYTICS RENDER ---
         function renderAnalytics() {
             const f = tasks, total = f.length, done = f.filter(t=>t.status==='Finished').length;
-            const rate = total ? Math.round(done/total*100) : 0;
-            
             document.getElementById('insight-box').innerHTML = `
                 <div style="background:var(--primary); color:white; padding:20px; border-radius:20px"><h4>Seedlings</h4><h2>${total}</h2></div>
-                <div style="background:white; border:1px solid var(--border); padding:20px; border-radius:20px"><h4>Efficiency</h4><h2>${rate}%</h2></div>
-                <div style="background:#fff4f4; padding:20px; border-radius:20px"><h4>Growing</h4><h2>${f.filter(t=>t.status==='In-Progress').length}</h2></div>
+                <div style="background:white; border:1px solid var(--border); padding:20px; border-radius:20px"><h4>Growth Rate</h4><h2>${total?Math.round(done/total*100):0}%</h2></div>
+                <div style="background:#fff4f4; padding:20px; border-radius:20px"><h4>Active</h4><h2>${f.filter(t=>t.status==='In-Progress').length}</h2></div>
                 <div style="background:var(--accent); color:white; padding:20px; border-radius:20px"><h4>Bloomed</h4><h2>${done}</h2></div>`;
-
-            const options = { maintainAspectRatio: false, responsive: true };
-
+            
+            const opts = { maintainAspectRatio: false, responsive: true };
+            
             if(charts.s) charts.s.destroy();
-            charts.s = new Chart(document.getElementById('c-status'), { 
-                type:'doughnut', 
-                data:{ labels:['To Do','Active','Done'], datasets:[{data:[f.filter(t=>t.status==='Not Started').length, f.filter(t=>t.status==='In-Progress').length, done], backgroundColor:['#cbd5e1','#7B61FF','#4CAF50']}] },
-                options: options
-            });
-
+            charts.s = new Chart(document.getElementById('c-status'), { type:'doughnut', data:{ labels:['To Do','Active','Done'], datasets:[{data:[f.filter(t=>t.status==='Not Started').length, f.filter(t=>t.status==='In-Progress').length, done], backgroundColor:['#cbd5e1','#7B61FF','#4CAF50']}] }, options: opts });
+            
             if(charts.t) charts.t.destroy();
             const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            charts.t = new Chart(document.getElementById('c-timeline'), { 
-                type:'line', 
-                data:{ labels:months, datasets:[{label:'Finished', data:months.map((m,i)=>f.filter(t=>t.status==='Finished'&&t.end&&new Date(t.end).getMonth()===i).length), borderColor:'var(--accent)', tension:0.4, fill:true, backgroundColor:'rgba(76, 175, 80, 0.1)'}] },
-                options: options
-            });
-
+            charts.t = new Chart(document.getElementById('c-timeline'), { type:'line', data:{ labels:months, datasets:[{label:'Finished', data:months.map((m,i)=>f.filter(t=>t.status==='Finished'&&t.end&&new Date(t.end).getMonth()===i).length), borderColor:'var(--accent)', tension:0.4}] }, options: opts });
+            
+            // FIXED OWNER PERFORMANCE CHART
             if(charts.o) charts.o.destroy();
-            const ownerMap = {};
-            f.filter(t=>t.status==='Finished').forEach(t => { const o = t.owner || 'Unknown'; ownerMap[o] = (ownerMap[o]||0)+1; });
-            charts.o = new Chart(document.getElementById('c-owners'), {
-                type:'bar',
-                data: { labels: Object.keys(ownerMap), datasets: [{ label: 'Completed', data: Object.values(ownerMap), backgroundColor: 'var(--primary)' }] },
-                options: { ...options, indexAxis: 'y' }
+            const oMap = {}; 
+            f.filter(t=>t.status==='Finished').forEach(t => { 
+                const name = (t.owner && t.owner.trim() !== '') ? t.owner.trim() : 'Unassigned';
+                oMap[name] = (oMap[name]||0)+1; 
             });
-
+            charts.o = new Chart(document.getElementById('c-owners'), { 
+                type:'bar', 
+                data: { labels: Object.keys(oMap), datasets: [{ label: 'Bloomed Tasks', data: Object.values(oMap), backgroundColor: 'var(--primary)' }] }, 
+                options: { ...opts, indexAxis: 'y' } 
+            });
+            
             if(charts.p) charts.p.destroy();
-            charts.p = new Chart(document.getElementById('c-priority'), {
-                type: 'polarArea',
-                data: { labels: ['High', 'Med', 'Low'], datasets: [{ data: [f.filter(t=>t.importance==='High').length, f.filter(t=>t.importance==='Medium').length, f.filter(t=>t.importance==='Low').length], backgroundColor: ['#ff444466', '#ffb30066', '#94a3b866'] }] },
-                options: options
-            });
+            charts.p = new Chart(document.getElementById('c-priority'), { type: 'polarArea', data: { labels: ['High', 'Med', 'Low'], datasets: [{ data: [f.filter(t=>t.importance==='High').length, f.filter(t=>t.importance==='Medium').length, f.filter(t=>t.importance==='Low').length], backgroundColor: ['#ff444466', '#ffb30066', '#94a3b866'] }] }, options: opts });
         }
 
-        // --- Modals & Initialization ---
+        function renderActive() {
+            const q = document.getElementById('globalSearch').value.toLowerCase();
+            const pFilter = document.getElementById('priorityFilter').value;
+            
+            const filtered = tasks.filter(t => {
+                const match = t.name.toLowerCase().includes(q) || (t.owner && t.owner.toLowerCase().includes(q));
+                const prio = pFilter === 'All' || t.importance === pFilter;
+                return match && prio;
+            });
+
+            // KANBAN
+            const cols = {'Not Started': 'board-notstarted', 'In-Progress': 'board-inprogress', 'Finished': 'board-finished'};
+            Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
+            filtered.filter(t => !t.archived).forEach(t => {
+                const color = t.importance === 'High' ? 'var(--p-high)' : (t.importance === 'Medium' ? 'var(--p-med)' : 'var(--p-low)');
+                document.getElementById(cols[t.status]).innerHTML += `<div class="task-card" draggable="true" ondragstart="drag(event, ${t.id})" onclick="openModal(${t.id})" style="border-left-color:${color}"><div style="font-weight:800; font-size:13px">${t.name}</div><div style="font-size:10px; color:var(--text-muted); margin-top:5px">${t.owner || 'Unassigned'}</div></div>`;
+            });
+
+            // LIST
+            const listTasks = [...filtered];
+            if (dateSortDir !== 'none') {
+                listTasks.sort((a, b) => {
+                    const dA = a.end ? new Date(a.end) : new Date('9999'), dB = b.end ? new Date(b.end) : new Date('9999');
+                    return dateSortDir === 'asc' ? dA - dB : dB - dA;
+                });
+            }
+
+            const row = (t) => {
+                const scale = (t.end && new Date(t.end) < new Date() && t.status !== 'Finished') ? 1.8 : 1.0;
+                return `<tr class="list-row" draggable="${dateSortDir === 'none'}" ondragstart="dragList(event, ${t.id})" ondragover="allow(event)" ondrop="dropList(event, ${t.id})">
+                    <td><div style="font-weight:700;"><span class="priority-dot ${t.importance==='High'?'pulse-high':''}" style="background:${t.importance==='High'?'var(--p-high)':(t.importance==='Medium'?'var(--p-med)':'var(--p-low)')}; transform: scale(${scale})"></span>${t.name}</div></td>
+                    <td>${t.owner || '-'}</td>
+                    <td style="font-size:11px;">${t.start || '...'} → ${t.end || '...'}</td>
+                    <td><span class="pill ${t.status==='Finished'?'pill-done':(t.status==='In-Progress'?'pill-progress':'pill-todo')}">${t.status}</span></td>
+                    <td style="text-align:right">
+                        <div style="display:flex; gap:10px; justify-content:flex-end">
+                            <button onclick="openModal(${t.id})" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="edit-3" size="16"></i></button>
+                            ${!t.archived && t.status === 'Finished' ? `<button onclick="toggleArchive(${t.id}, true)" title="Harvest" style="border:none; background:none; cursor:pointer; color:var(--accent)"><i data-lucide="package" size="16"></i></button>` : ''}
+                            ${t.archived ? `<button onclick="toggleArchive(${t.id}, false)" title="Restore" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="rotate-ccw" size="16"></i></button>` : ''}
+                            <button onclick="deleteTask(${t.id})" style="border:none; background:none; cursor:pointer; color:#ff4444"><i data-lucide="trash-2" size="16"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            };
+            document.getElementById('list-tbody').innerHTML = listTasks.filter(t => !t.archived).map(row).join('');
+            document.getElementById('archive-tbody').innerHTML = listTasks.filter(t => t.archived).map(row).join('');
+            
+            renderTimeline();
+            renderAnalytics();
+            lucide.createIcons();
+        }
+
+        function logAction(task, text) { task.comments = task.comments || []; task.comments.push({ type: 'log', text: `[${new Date().toLocaleTimeString()}] ${text}` }); }
+        
         function openModal(id = null) {
             document.getElementById('taskForm').reset();
             document.getElementById('editId').value = id || '';
             const t = tasks.find(x => x.id == id);
             if(t) {
-                document.getElementById('mName').value = t.name;
-                document.getElementById('mDesc').value = t.desc || '';
-                document.getElementById('mStart').value = t.start || '';
-                document.getElementById('mEnd').value = t.end || '';
-                document.getElementById('mOwner').value = t.owner || '';
-                document.getElementById('mImp').value = t.importance;
+                document.getElementById('mName').value = t.name; document.getElementById('mDesc').value = t.desc || '';
+                document.getElementById('mStart').value = t.start || ''; document.getElementById('mEnd').value = t.end || '';
+                document.getElementById('mOwner').value = t.owner || ''; document.getElementById('mImp').value = t.importance;
                 document.getElementById('mStat').value = t.status;
-                document.getElementById('chatContainer').innerHTML = (t.comments || []).map(c => `<div class="sms-bubble ${c.mine?'sms-mine':''}">${c.text}</div>`).join('');
+                document.getElementById('chatContainer').innerHTML = (t.comments || []).map(c => c.type === 'log' ? `<div class="log-entry">${c.text}</div>` : `<div class="sms-bubble ${c.mine?'sms-mine':''}">${c.text}</div>`).join('');
             } else { document.getElementById('chatContainer').innerHTML = ''; }
             document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        function addComment() {
-            const input = document.getElementById('chatInput'); if(!input.value) return;
-            const id = document.getElementById('editId').value;
-            if(!id) return alert("Save first.");
-            const t = tasks.find(x => x.id == id);
-            t.comments = t.comments || [];
-            t.comments.push({ text: input.value, mine: true });
-            input.value = ''; save(); openModal(id);
         }
 
         document.getElementById('taskForm').onsubmit = (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
             const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('mName').value, desc: document.getElementById('mDesc').value, start: document.getElementById('mStart').value, end: document.getElementById('mEnd').value, owner: document.getElementById('mOwner').value, importance: document.getElementById('mImp').value, status: document.getElementById('mStat').value, archived: false };
-            if(id) tasks = tasks.map(t => t.id == id ? {...t, ...obj} : t); else tasks.push(obj);
+            if(!id) { obj.comments = []; logAction(obj, "Task Planted"); tasks.push(obj); } else { tasks = tasks.map(t => t.id == id ? {...t, ...obj} : t); }
             save(); document.getElementById('taskModal').style.display = 'none';
         };
 
-        function openGithubConfig() { document.getElementById('githubModal').style.display = 'flex'; }
-        function closeGithubModal() { document.getElementById('githubModal').style.display = 'none'; }
-        function saveGithubConfig() {
-            config = { token: document.getElementById('ghToken').value, repo: document.getElementById('ghRepo').value, path: document.getElementById('ghPath').value };
-            localStorage.setItem('GH_CONFIG', JSON.stringify(config));
-            closeGithubModal(); loadData();
+        function addComment() {
+            const input = document.getElementById('chatInput'), id = document.getElementById('editId').value;
+            if(!input.value || !id) return;
+            const t = tasks.find(x => x.id == id);
+            t.comments.push({ text: input.value, mine: true });
+            input.value = ''; save(); openModal(id);
         }
 
-        function exportTasks() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks, null, 2));
-            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "PlanTask_backup.json"); dl.click();
-        }
-
+        function toggleArchive(id, state) { tasks = tasks.map(t => t.id == id ? {...t, archived: state} : t); save(); }
+        function deleteTask(id) { if(confirm("Permanently delete?")) { tasks = tasks.filter(t => t.id != id); save(); } }
         function checkClose(e) { if(e.target.className === 'modal') e.target.style.display = 'none'; }
-        function renderActive() { renderBoard(); renderList(); renderTimeline(); renderAnalytics(); lucide.createIcons(); }
+        function exportTasks() { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks, null, 2)); const dl = document.createElement('a'); dl.setAttribute("href", str); dl.setAttribute("download", "PlanTask_backup.json"); dl.click(); }
+
         loadData();
     </script>
 </body>
