@@ -21,12 +21,9 @@
 
         /* Sidebar */
         aside { width: 280px; background: var(--primary-dark); padding: 30px 20px; display: flex; flex-direction: column; color: var(--text-light); flex-shrink: 0; }
-        .logo-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 35px; }
-        .logo-flex { display: flex; align-items: center; gap: 12px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 24px; }
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 35px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 24px; }
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; }
         .leaf-icon { position: absolute; top: -8px; right: -5px; color: var(--accent); transform: rotate(15deg); }
-        .settings-trigger { cursor: pointer; opacity: 0.6; transition: 0.3s; }
-        .settings-trigger:hover { opacity: 1; transform: rotate(45deg); }
         
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; font-weight: 700; color: rgba(255,255,255,0.7); transition: 0.3s; }
         .nav-item.active { background: var(--primary); color: #fff; }
@@ -34,57 +31,72 @@
         .create-btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; font-family: 'Montserrat'; cursor: pointer; margin-bottom: 25px; }
 
         .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
-        .sync-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; }
         .data-btn { width: 100%; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        #sync-status { font-size: 10px; color: #a78bfa; text-align: center; margin-bottom: 5px; }
+        #sync-status { font-size: 10px; color: #a78bfa; text-align: center; }
 
         /* Main Content */
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 30px 0 0 30px; margin: 10px 0; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
         header { padding: 25px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; }
         .view-section { display: none; padding: 30px 40px; overflow-y: auto; flex: 1; }
 
-        /* Kanban */
+        /* Kanban Board */
         .kanban-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .kanban-col { background: #f8f9fa; padding: 20px; border-radius: 24px; min-height: 60vh; }
         .task-card { background: #fff; padding: 18px; border-radius: 16px; margin-bottom: 15px; cursor: grab; border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* Tables */
+        /* List View */
         .list-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; table-layout: fixed; }
         .list-table th { text-align: left; padding: 10px 20px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .list-row td { background: #fcfaff; padding: 15px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .list-row.dragging { opacity: 0.4; background: #f0ebff; }
 
-        /* Timeline */
+        /* Timeline View */
+        .timeline-controls { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #f8f9fa; padding: 10px 15px; border-radius: 15px; border: 1px solid var(--border); }
+        .range-pill { padding: 6px 14px; border-radius: 20px; background: #fff; border: 1px solid var(--border); font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .range-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .custom-range-inputs { display: none; gap: 8px; align-items: center; }
+        
         .timeline-container { display: flex; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; height: 500px; background: #fff; }
         .t-sidebar { width: 300px; border-right: 1px solid var(--border); background: #fbfaff; flex-shrink: 0; }
-        .t-grid { flex: 1; overflow-x: auto; position: relative; }
+        .t-grid { flex: 1; overflow-x: auto; position: relative; scroll-behavior: smooth; }
         .t-day { width: 80px; flex-shrink: 0; border-right: 1px solid #eee; text-align: center; font-size: 10px; padding: 15px 0; font-weight: 700; color: var(--text-muted); }
         .t-bar { position: absolute; height: 32px; border-radius: 16px; color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-space: nowrap; }
+        .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today-line); z-index: 10; pointer-events: none; }
 
-        /* Stats */
+        /* Growth Stats - Fixed Height Wrappers */
         .chart-card { background: white; border: 1px solid var(--border); border-radius: 24px; padding: 20px; height: 320px; display: flex; flex-direction: column; position: relative; }
+        .chart-card h4 { margin-bottom: 15px; font-family: 'Montserrat'; font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
         .chart-wrapper { flex: 1; position: relative; min-height: 0; }
 
-        /* Modals */
+        /* Priority Dot Scaling & Pulse */
+        .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 12px; transition: transform 0.3s ease; }
+        .pulse-high { animation: dot-pulse 1.5s infinite; }
+        @keyframes dot-pulse {
+            0% { box-shadow: 0 0 0 0px rgba(255, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(255, 68, 68, 0); }
+        }
+        
+        .pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
+        .pill-todo { background: #e2e8f0; color: #475569; }
+        .pill-progress { background: #fff7ed; color: #c2410c; }
+        .pill-done { background: #f0fdf4; color: #15803d; }
+
+        /* Modals & Messaging */
         .modal { display: none; position: fixed; inset: 0; background: rgba(90, 62, 186, 0.4); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-card { background: #fff; width: 1000px; border-radius: 30px; display: grid; grid-template-columns: 1fr 380px; height: 85vh; overflow: hidden; }
-        .settings-modal-card { background: #fff; width: 450px; border-radius: 24px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-family: inherit; }
-
-        .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 12px; }
-        .pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 15px; background: #f3f0ff; border-radius: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .sms-bubble { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 12px; background: #fff; align-self: flex-start; line-height: 1.4; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .sms-mine { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .log-entry { font-size: 10px; color: var(--text-muted); text-align: center; margin: 5px 0; font-style: italic; opacity: 0.8; }
     </style>
 </head>
 <body onmousedown="checkClose(event)">
 
     <aside>
         <div class="logo-container">
-            <div class="logo-flex">
-                <div class="logo-icon-wrapper"><i data-lucide="menu" size="32"></i><i data-lucide="leaf" size="16" class="leaf-icon"></i></div>
-                <span>PlanTask</span>
-            </div>
-            <i data-lucide="settings" class="settings-trigger" onclick="openSettings()"></i>
+            <div class="logo-icon-wrapper"><i data-lucide="menu" size="32"></i><i data-lucide="leaf" size="16" class="leaf-icon"></i></div>
+            <span>PlanTask</span>
         </div>
         <button class="create-btn" onclick="openModal()">+ New Task</button>
         <nav>
@@ -95,8 +107,7 @@
             <div class="nav-item" onclick="switchView('archive', this)"><i data-lucide="archive-restore"></i> Harvested</div>
         </nav>
         <div class="sidebar-footer">
-            <div id="sync-status">Status: Offline</div>
-            <button class="sync-btn" onclick="loadData()"><i data-lucide="refresh-cw" id="sync-icon"></i> Sync Now</button>
+            <div id="sync-status">Status: Connecting...</div>
             <button class="data-btn" onclick="exportTasks()"><i data-lucide="file-down"></i> Local Backup</button>
         </div>
     </aside>
@@ -112,16 +123,32 @@
 
         <div id="view-board" class="view-section" style="display: block;">
             <div class="kanban-grid">
-                <div id="Not Started" class="kanban-col" ondrop="drop(event)" ondragover="allow(event)"><p style="font-weight: 800; font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">PLANTING</p><div id="board-notstarted"></div></div>
-                <div id="In-Progress" class="kanban-col" ondrop="drop(event)" ondragover="allow(event)"><p style="font-weight: 800; font-size: 11px; color: var(--primary); margin-bottom: 20px;">GROWING</p><div id="board-inprogress"></div></div>
-                <div id="Finished" class="kanban-col" ondrop="drop(event)" ondragover="allow(event)"><p style="font-weight: 800; font-size: 11px; color: var(--accent); margin-bottom: 20px;">BLOOMED</p><div id="board-finished"></div></div>
+                <div id="Not Started" class="kanban-col" ondrop="drop(event)" ondragover="allow(event)">
+                    <p style="font-weight: 800; font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">PLANTING</p>
+                    <div id="board-notstarted"></div>
+                </div>
+                <div id="In-Progress" class="kanban-col" ondrop="drop(event)" ondragover="allow(event)">
+                    <p style="font-weight: 800; font-size: 11px; color: var(--primary); margin-bottom: 20px;">GROWING</p>
+                    <div id="board-inprogress"></div>
+                </div>
+                <div id="Finished" class="kanban-col" ondrop="drop(event)" ondragover="allow(event)">
+                    <p style="font-weight: 800; font-size: 11px; color: var(--accent); margin-bottom: 20px;">BLOOMED</p>
+                    <div id="board-finished"></div>
+                </div>
             </div>
         </div>
 
         <div id="view-list" class="view-section">
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <button onclick="toggleDateSort()" class="data-btn" style="background: white; color: var(--text-main); border: 1px solid var(--border); width: auto; padding: 10px 15px;">Sort: <span id="sortDirText">Manual</span></button>
-                <select id="priorityFilter" onchange="renderActive()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border);"><option value="All">All Priorities</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+            <div class="list-controls" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center;">
+                <button onclick="toggleDateSort()" class="data-btn" style="background: white; color: var(--text-main); border: 1px solid var(--border); width: auto; padding: 10px 15px;">
+                    <i data-lucide="calendar" size="14"></i> Sort: <span id="sortDirText">Manual</span>
+                </button>
+                <select id="priorityFilter" onchange="renderActive()" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
+                    <option value="All">All Priorities</option>
+                    <option value="High">High Only</option>
+                    <option value="Medium">Medium Only</option>
+                    <option value="Low">Low Only</option>
+                </select>
             </div>
             <table class="list-table">
                 <thead><tr><th>Goal & Vision</th><th>Owner</th><th>Timeline</th><th>Status</th><th style="text-align:right">Action</th></tr></thead>
@@ -130,6 +157,18 @@
         </div>
 
         <div id="view-timeline" class="view-section">
+            <div class="timeline-controls">
+                <button class="range-pill" id="btn-week" onclick="setTimelineRange('week')">Weekly</button>
+                <button class="range-pill active" id="btn-month" onclick="setTimelineRange('month')">Monthly</button>
+                <button class="range-pill" id="btn-year" onclick="setTimelineRange('year')">Yearly</button>
+                <button class="range-pill" id="btn-custom" onclick="setTimelineRange('custom')">Custom</button>
+                <div class="custom-range-inputs" id="custom-date-box">
+                    <input type="date" id="t-start-custom" onchange="renderTimeline()" style="padding:5px; border-radius:8px; border:1px solid var(--border)">
+                    <span style="font-size: 10px;">to</span>
+                    <input type="date" id="t-end-custom" onchange="renderTimeline()" style="padding:5px; border-radius:8px; border:1px solid var(--border)">
+                </div>
+                <button onclick="jumpToToday()" class="data-btn" style="width:auto; margin-left:auto; background:var(--primary); color:white;">Today</button>
+            </div>
             <div class="timeline-container">
                 <div class="t-sidebar" id="t-side-items"></div>
                 <div class="t-grid" id="t-scroll-box">
@@ -141,9 +180,25 @@
 
         <div id="view-analytics" class="view-section">
             <div id="insight-box" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;"></div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-                <div class="chart-card"><h4>Status Distribution</h4><div class="chart-wrapper"><canvas id="c-status"></canvas></div></div>
-                <div class="chart-card"><h4>Owner Performance</h4><div class="chart-wrapper"><canvas id="c-owners"></canvas></div></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                <div class="chart-card">
+                    <h4>Status Distribution</h4>
+                    <div class="chart-wrapper"><canvas id="c-status"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Growth Trends</h4>
+                    <div class="chart-wrapper"><canvas id="c-timeline"></canvas></div>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 25px;">
+                <div class="chart-card">
+                    <h4>Owner Performance (Bloomed)</h4>
+                    <div class="chart-wrapper"><canvas id="c-owners"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Priority Saturation</h4>
+                    <div class="chart-wrapper"><canvas id="c-priority"></canvas></div>
+                </div>
             </div>
         </div>
 
@@ -161,149 +216,275 @@
                 <h2 style="margin-bottom:25px; color:var(--primary-dark)">Task Editor</h2>
                 <form id="taskForm">
                     <input type="hidden" id="editId">
-                    <input type="text" id="mName" placeholder="Task Name" style="width:100%; padding:15px; border-radius:12px; border: 1px solid var(--border); margin-bottom:15px;" required>
-                    <textarea id="mDesc" placeholder="Description..." style="width:100%; padding:15px; border-radius:12px; border: 1px solid var(--border); height:120px; margin-bottom:15px;"></textarea>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px"><input type="date" id="mStart"><input type="date" id="mEnd"></div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px"><input type="text" id="mOwner" placeholder="Owner"><select id="mImp"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
-                    <select id="mStat" style="width:100%; padding:15px; margin-bottom:25px;"><option>Not Started</option><option>In-Progress</option><option>Finished</option></select>
+                    <input type="text" id="mName" placeholder="Task Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px;" required>
+                    <textarea id="mDesc" placeholder="Describe your vision..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); height:120px; margin-bottom:15px;"></textarea>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+                        <input type="date" id="mStart" style="padding:12px; border-radius:12px; border:1px solid var(--border)">
+                        <input type="date" id="mEnd" style="padding:12px; border-radius:12px; border:1px solid var(--border)">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px">
+                        <input type="text" id="mOwner" placeholder="Owner" style="padding:12px; border-radius:12px; border:1px solid var(--border)">
+                        <select id="mImp" style="padding:12px; border-radius:12px; border:1px solid var(--border)">
+                            <option>High</option><option selected>Medium</option><option>Low</option>
+                        </select>
+                    </div>
+                    <select id="mStat" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-bottom:25px;">
+                        <option>Not Started</option><option>In-Progress</option><option>Finished</option>
+                    </select>
                     <button type="submit" style="width:100%; background:var(--primary); color:#fff; padding:15px; border-radius:12px; border:none; font-weight:800; cursor:pointer;">Save Task</button>
                 </form>
             </div>
             <div style="background:#f9f8ff; padding:30px; display:flex; flex-direction:column">
+                <h4 style="font-size:11px; color:var(--text-muted); margin-bottom:15px;">NOTES & LOGS</h4>
                 <div id="chatContainer" class="chat-container"></div>
-                <input type="text" id="chatInput" placeholder="Add note..." style="margin-top:15px; padding:10px; border-radius:20px; border:1px solid var(--border);" onkeypress="if(event.key==='Enter') addComment()">
+                <div style="display:flex; gap:8px; margin-top:15px">
+                    <input type="text" id="chatInput" placeholder="Add a note..." style="flex:1; padding:10px; border-radius:20px; border:1px solid var(--border);" onkeypress="if(event.key==='Enter') addComment()">
+                    <button onclick="addComment()" style="background:var(--primary); color:white; border:none; width:35px; border-radius:50%; cursor:pointer;">+</button>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <div class="modal" id="settingsModal">
-        <div class="settings-modal-card">
-            <h2 style="margin-bottom:20px;">Cloud Settings</h2>
-            <div class="form-group"><label>GitHub Personal Access Token</label><input type="password" id="cfgToken" placeholder="ghp_xxxx..."></div>
-            <div class="form-group"><label>Repository (User/Repo)</label><input type="text" id="cfgRepo" placeholder="ApoJukai/Unify"></div>
-            <div class="form-group"><label>File Path</label><input type="text" id="cfgPath" placeholder="tasks.json"></div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button onclick="saveSettings()" style="flex:1; background:var(--accent); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer;">Save & Connect</button>
-                <button onclick="closeSettings()" style="flex:1; background:#eee; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer;">Cancel</button>
-            </div>
-            <p style="font-size:10px; color:var(--text-muted); margin-top:15px;">Your token is stored locally in your browser and never sent to our servers.</p>
         </div>
     </div>
 
     <script>
-        let config = JSON.parse(localStorage.getItem('PlanTask_Config')) || { token: '', repo: '', path: 'tasks.json' };
+        // GitHub Config
+        const GH_TOKEN = "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";
+        const GH_REPO = "ApoJukai/Unify";
+        const GH_PATH = "tasks.json";
+
         let tasks = [];
         let currentFileSha = null;
         let charts = {};
-        let dateSortDir = 'none';
+        let dateSortDir = 'none'; 
+        let draggedIdx = null;
+        let timelineMode = 'month';
 
+        // --- GitHub Sync Layer ---
         async function loadData() {
-            if (!config.token || !config.repo) { updateStatus("Setup Required"); return; }
             updateStatus("Syncing...");
-            document.getElementById('sync-icon').classList.add('lucide-spin');
-
             try {
-                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${config.path}`, {
-                    headers: { 'Authorization': `token ${config.token}`, 'Cache-Control': 'no-cache' }
+                const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`, {
+                    headers: { 'Authorization': `token ${GH_TOKEN}` }
                 });
                 if (res.ok) {
                     const data = await res.json();
                     currentFileSha = data.sha;
                     tasks = JSON.parse(atob(data.content));
                     updateStatus("Cloud Synced");
-                } else { throw new Error(); }
-            } catch (e) {
-                updateStatus("Local Mode");
-                tasks = JSON.parse(localStorage.getItem('PlanTask_Data')) || [];
-            }
-            document.getElementById('sync-icon').classList.remove('lucide-spin');
+                } else {
+                    tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || [];
+                    updateStatus("Local Mode");
+                }
+            } catch (e) { updateStatus("Offline"); tasks = JSON.parse(localStorage.getItem('PlanTask_V1')) || []; }
             renderActive();
         }
 
         async function save() {
             renderActive();
-            localStorage.setItem('PlanTask_Data', JSON.stringify(tasks));
-            if (!config.token || !config.repo) return;
-            
+            localStorage.setItem('PlanTask_V1', JSON.stringify(tasks));
             const content = btoa(JSON.stringify(tasks, null, 2));
             try {
-                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${config.path}`, {
+                const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`, {
                     method: 'PUT',
-                    headers: { 'Authorization': `token ${config.token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: "Update Tasks", content: content, sha: currentFileSha })
+                    headers: { 'Authorization': `token ${GH_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Sync Update", content: content, sha: currentFileSha })
                 });
                 if (res.ok) {
                     const data = await res.json();
                     currentFileSha = data.content.sha;
                     updateStatus("Cloud Saved");
                 }
-            } catch (e) { updateStatus("Cloud Error"); }
+            } catch (e) { updateStatus("Save Error"); }
         }
 
-        function openSettings() {
-            document.getElementById('cfgToken').value = config.token;
-            document.getElementById('cfgRepo').value = config.repo;
-            document.getElementById('cfgPath').value = config.path;
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function saveSettings() {
-            config = {
-                token: document.getElementById('cfgToken').value,
-                repo: document.getElementById('cfgRepo').value,
-                path: document.getElementById('cfgPath').value
-            };
-            localStorage.setItem('PlanTask_Config', JSON.stringify(config));
-            closeSettings();
-            loadData();
-        }
-
-        function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
         function updateStatus(msg) { document.getElementById('sync-status').innerText = `Status: ${msg}`; }
 
-        function renderActive() {
-            const q = document.getElementById('globalSearch').value.toLowerCase();
-            const filtered = tasks.filter(t => t.name.toLowerCase().includes(q));
-
-            // Kanban
-            const cols = {'Not Started': 'board-notstarted', 'In-Progress': 'board-inprogress', 'Finished': 'board-finished'};
-            Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
-            filtered.filter(t => !t.archived).forEach(t => {
-                document.getElementById(cols[t.status]).innerHTML += `<div class="task-card" draggable="true" ondragstart="drag(event, ${t.id})" onclick="openModal(${t.id})"><b>${t.name}</b><br><small>${t.owner || 'Unassigned'}</small></div>`;
-            });
-
-            // List & Archive
-            const row = (t) => `<tr class="list-row"><td>${t.name}</td><td>${t.owner}</td><td>${t.end}</td><td>${t.status}</td><td style="text-align:right">
-                <button onclick="openModal(${t.id})">Edit</button>
-                ${t.archived ? `<button onclick="toggleArchive(${t.id}, false)">Restore</button>` : (t.status==='Finished'?`<button onclick="toggleArchive(${t.id}, true)">Harvest</button>`:'')}
-            </td></tr>`;
-            document.getElementById('list-tbody').innerHTML = filtered.filter(t => !t.archived).map(row).join('');
-            document.getElementById('archive-tbody').innerHTML = filtered.filter(t => t.archived).map(row).join('');
-            
-            renderStats();
-            lucide.createIcons();
-        }
-
-        function renderStats() {
-            const done = tasks.filter(t => t.status === 'Finished');
-            const oMap = {}; 
-            done.forEach(t => { const n = t.owner || 'Unassigned'; oMap[n] = (oMap[n] || 0) + 1; });
-            
-            if(charts.o) charts.o.destroy();
-            charts.o = new Chart(document.getElementById('c-owners'), {
-                type: 'bar',
-                data: { labels: Object.keys(oMap), datasets: [{ label: 'Bloomed', data: Object.values(oMap), backgroundColor: '#7B61FF' }] },
-                options: { maintainAspectRatio: false, indexAxis: 'y' }
-            });
-        }
-
-        function toggleArchive(id, state) { tasks = tasks.map(t => t.id == id ? {...t, archived: state} : t); save(); }
+        // --- Navigation ---
         function switchView(v, el) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
             document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
             document.getElementById('view-' + v).style.display = 'block';
+            document.getElementById('view-title').innerText = el.innerText;
             renderActive();
+        }
+
+        // --- Kanban Drag & Drop ---
+        function allow(e) { e.preventDefault(); }
+        function drag(e, id) { e.dataTransfer.setData("text", id); }
+        function drop(e) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData("text");
+            const newStatus = e.currentTarget.id;
+            const t = tasks.find(x => x.id == id);
+            if(t.status !== newStatus) logAction(t, `Moved to ${newStatus}`);
+            t.status = newStatus;
+            save();
+        }
+
+        // --- List Features ---
+        function toggleDateSort() {
+            if (dateSortDir === 'none') dateSortDir = 'asc';
+            else if (dateSortDir === 'asc') dateSortDir = 'desc';
+            else dateSortDir = 'none';
+            document.getElementById('sortDirText').innerText = dateSortDir.toUpperCase();
+            renderActive();
+        }
+
+        function dragList(e, id) { if (dateSortDir !== 'none') return; draggedIdx = tasks.findIndex(t => t.id == id); e.target.classList.add('dragging'); }
+        function dropList(e, targetId) {
+            e.preventDefault();
+            const targetIdx = tasks.findIndex(t => t.id == targetId);
+            if (draggedIdx !== null && targetIdx !== -1) {
+                const [movedItem] = tasks.splice(draggedIdx, 1);
+                tasks.splice(targetIdx, 0, movedItem);
+                save();
+            }
+            draggedIdx = null;
+        }
+
+        // --- Timeline Logic ---
+        function setTimelineRange(mode) {
+            timelineMode = mode;
+            document.querySelectorAll('.range-pill').forEach(p => p.classList.remove('active'));
+            document.getElementById('btn-' + mode).classList.add('active');
+            document.getElementById('custom-date-box').style.display = (mode === 'custom') ? 'flex' : 'none';
+            renderTimeline();
+        }
+
+        function jumpToToday() { const el = document.querySelector('.today-line'); if(el) el.scrollIntoView({ behavior: 'smooth', inline: 'center' }); }
+
+        function renderTimeline() {
+            const head = document.getElementById('t-headers'), bars = document.getElementById('t-bars-container'), side = document.getElementById('t-side-items');
+            head.innerHTML = ''; bars.innerHTML = ''; side.innerHTML = '';
+            
+            let startDate = new Date(); startDate.setHours(0,0,0,0);
+            let days = 30;
+
+            if (timelineMode === 'week') days = 7;
+            else if (timelineMode === 'year') days = 365;
+            else if (timelineMode === 'custom') {
+                const s = document.getElementById('t-start-custom').value;
+                const e = document.getElementById('t-end-custom').value;
+                if (s && e) {
+                    startDate = new Date(s);
+                    days = Math.max(1, Math.round((new Date(e) - startDate) / 864e5) + 1);
+                }
+            }
+
+            const dayW = timelineMode === 'year' ? 30 : 80;
+
+            for(let i=0; i<days; i++) {
+                const d = new Date(startDate); d.setDate(d.getDate()+i);
+                const isToday = d.toDateString() === new Date().toDateString();
+                head.innerHTML += `<div class="t-day" style="width:${dayW}px; ${isToday?'background:#fff4f4; color:var(--today-line)':''}">${d.toLocaleDateString([], {month:'short', day:'numeric'})}</div>`;
+                if(isToday) bars.innerHTML += `<div class="today-line" style="left:${i*dayW}px"></div>`;
+            }
+
+            tasks.filter(t => !t.archived && t.start && t.end).forEach((t, i) => {
+                const start = new Date(t.start), end = new Date(t.end);
+                const offset = (start - startDate) / 864e5, duration = (end - start) / 864e5 + 1;
+                if (offset + duration > 0 && offset < days) {
+                    bars.innerHTML += `<div class="t-bar" onclick="openModal(${t.id})" style="top:${i*50+9}px; left:${offset*dayW}px; width:${duration*dayW}px; background:${t.status==='Finished'?'var(--accent)':'var(--primary)'}">${t.name}</div>`;
+                }
+                side.innerHTML += `<div style="height:50px; padding:15px; border-bottom:1px solid #eee; font-size:12px; font-weight:700;">${t.name}</div>`;
+            });
+        }
+
+        // --- Growth Stats Logic (Fix for Resizing issue) ---
+        function renderAnalytics() {
+            const f = tasks, total = f.length, done = f.filter(t=>t.status==='Finished').length;
+            document.getElementById('insight-box').innerHTML = `
+                <div style="background:var(--primary); color:white; padding:20px; border-radius:20px"><h4>Seedlings</h4><h2>${total}</h2></div>
+                <div style="background:white; border:1px solid var(--border); padding:20px; border-radius:20px"><h4>Growth Rate</h4><h2>${total?Math.round(done/total*100):0}%</h2></div>
+                <div style="background:#fff4f4; padding:20px; border-radius:20px"><h4>Active</h4><h2>${f.filter(t=>t.status==='In-Progress').length}</h2></div>
+                <div style="background:var(--accent); color:white; padding:20px; border-radius:20px"><h4>Bloomed</h4><h2>${done}</h2></div>`;
+
+            const opts = { maintainAspectRatio: false, responsive: true };
+
+            if(charts.s) charts.s.destroy();
+            charts.s = new Chart(document.getElementById('c-status'), { 
+                type:'doughnut', 
+                data:{ labels:['To Do','Active','Done'], datasets:[{data:[f.filter(t=>t.status==='Not Started').length, f.filter(t=>t.status==='In-Progress').length, done], backgroundColor:['#cbd5e1','#7B61FF','#4CAF50']}] },
+                options: opts
+            });
+
+            if(charts.t) charts.t.destroy();
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            charts.t = new Chart(document.getElementById('c-timeline'), { 
+                type:'line', 
+                data:{ labels:months, datasets:[{label:'Finished', data:months.map((m,i)=>f.filter(t=>t.status==='Finished'&&t.end&&new Date(t.end).getMonth()===i).length), borderColor:'var(--accent)', tension:0.4}] },
+                options: opts
+            });
+
+            if(charts.o) charts.o.destroy();
+            const ownerMap = {};
+            f.filter(t=>t.status==='Finished').forEach(t => { const o = t.owner || 'Unknown'; ownerMap[o] = (ownerMap[o]||0)+1; });
+            charts.o = new Chart(document.getElementById('c-owners'), {
+                type:'bar', data: { labels: Object.keys(ownerMap), datasets: [{ label: 'Bloomed', data: Object.values(ownerMap), backgroundColor: 'var(--primary)' }] },
+                options: { ...opts, indexAxis: 'y' }
+            });
+
+            if(charts.p) charts.p.destroy();
+            charts.p = new Chart(document.getElementById('c-priority'), {
+                type: 'polarArea', data: { labels: ['High', 'Med', 'Low'], datasets: [{ data: [f.filter(t=>t.importance==='High').length, f.filter(t=>t.importance==='Medium').length, f.filter(t=>t.importance==='Low').length], backgroundColor: ['#ff444466', '#ffb30066', '#94a3b866'] }] },
+                options: opts
+            });
+        }
+
+        // --- Global Render Helper ---
+        function renderActive() {
+            const q = document.getElementById('globalSearch').value.toLowerCase();
+            const pFilter = document.getElementById('priorityFilter').value;
+            
+            // Re-render board
+            renderBoard();
+            
+            // Re-render list
+            const filtered = tasks.filter(t => {
+                const matchesSearch = t.name.toLowerCase().includes(q) || (t.owner && t.owner.toLowerCase().includes(q));
+                const matchesPriority = pFilter === 'All' || t.importance === pFilter;
+                return matchesSearch && matchesPriority;
+            });
+
+            if (dateSortDir !== 'none') {
+                filtered.sort((a, b) => {
+                    const dA = a.end ? new Date(a.end) : new Date('9999');
+                    const dB = b.end ? new Date(b.end) : new Date('9999');
+                    return dateSortDir === 'asc' ? dA - dB : dB - dA;
+                });
+            }
+
+            const getRowHtml = (t) => {
+                const isOverdue = t.end && new Date(t.end) < new Date() && t.status !== 'Finished';
+                const scale = isOverdue ? 1.8 : 1.0;
+                return `
+                <tr class="list-row" draggable="${dateSortDir === 'none'}" ondragstart="dragList(event, ${t.id})" ondragover="allow(event)" ondrop="dropList(event, ${t.id})">
+                    <td><div style="font-weight:700;"><span class="priority-dot ${t.importance==='High'?'pulse-high':''}" style="background:${t.importance==='High'?'var(--p-high)':(t.importance==='Medium'?'var(--p-med)':'var(--p-low)')}; transform: scale(${scale})"></span>${t.name}</div></td>
+                    <td>${t.owner || '-'}</td>
+                    <td style="font-size:11px;">${t.start || '...'} → ${t.end || '...'}</td>
+                    <td><span class="pill ${t.status==='Finished'?'pill-done':(t.status==='In-Progress'?'pill-progress':'pill-todo')}">${t.status}</span></td>
+                    <td style="text-align:right">
+                        <div style="display:flex; gap:10px; justify-content:flex-end">
+                            <button onclick="openModal(${t.id})" style="border:none; background:none; cursor:pointer; color:var(--primary)"><i data-lucide="edit-3" size="16"></i></button>
+                            ${!t.archived && t.status === 'Finished' ? `<button onclick="toggleArchive(${t.id}, true)" style="border:none; background:none; cursor:pointer; color:var(--accent)"><i data-lucide="package" size="16"></i></button>` : ''}
+                            <button onclick="deleteTask(${t.id})" style="border:none; background:none; cursor:pointer; color:#ff4444"><i data-lucide="trash-2" size="16"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            };
+
+            document.getElementById('list-tbody').innerHTML = filtered.filter(t => !t.archived).map(getRowHtml).join('');
+            document.getElementById('archive-tbody').innerHTML = filtered.filter(t => t.archived).map(getRowHtml).join('');
+            
+            renderTimeline();
+            renderAnalytics();
+            lucide.createIcons();
+        }
+
+        // --- Modals, Logs, Comments ---
+        function logAction(task, text) {
+            task.comments = task.comments || [];
+            task.comments.push({ type: 'log', text: `[${new Date().toLocaleTimeString()}] ${text}` });
         }
 
         function openModal(id = null) {
@@ -312,30 +493,46 @@
             const t = tasks.find(x => x.id == id);
             if(t) {
                 document.getElementById('mName').value = t.name;
-                document.getElementById('mOwner').value = t.owner;
+                document.getElementById('mDesc').value = t.desc || '';
+                document.getElementById('mStart').value = t.start || '';
+                document.getElementById('mEnd').value = t.end || '';
+                document.getElementById('mOwner').value = t.owner || '';
+                document.getElementById('mImp').value = t.importance;
                 document.getElementById('mStat').value = t.status;
-            }
+                document.getElementById('chatContainer').innerHTML = (t.comments || []).map(c => 
+                    c.type === 'log' ? `<div class="log-entry">${c.text}</div>` : `<div class="sms-bubble ${c.mine?'sms-mine':''}">${c.text}</div>`
+                ).join('');
+            } else { document.getElementById('chatContainer').innerHTML = ''; }
             document.getElementById('taskModal').style.display = 'flex';
         }
 
         document.getElementById('taskForm').onsubmit = (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('mName').value, owner: document.getElementById('mOwner').value, status: document.getElementById('mStat').value, archived: false };
-            if(!id) tasks.push(obj); else tasks = tasks.map(t => t.id == id ? {...t, ...obj} : t);
+            const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('mName').value, desc: document.getElementById('mDesc').value, start: document.getElementById('mStart').value, end: document.getElementById('mEnd').value, owner: document.getElementById('mOwner').value, importance: document.getElementById('mImp').value, status: document.getElementById('mStat').value, archived: false };
+            if(!id) { obj.comments = []; logAction(obj, "Task Planted"); tasks.push(obj); }
+            else { tasks = tasks.map(t => t.id == id ? {...t, ...obj} : t); }
             save(); document.getElementById('taskModal').style.display = 'none';
         };
 
-        function allow(e) { e.preventDefault(); }
-        function drag(e, id) { e.dataTransfer.setData("text", id); }
-        function drop(e) {
-            const id = e.dataTransfer.getData("text");
+        function addComment() {
+            const input = document.getElementById('chatInput'); if(!input.value) return;
+            const id = document.getElementById('editId').value;
+            if(!id) return;
             const t = tasks.find(x => x.id == id);
-            t.status = e.currentTarget.id;
-            save();
+            t.comments = t.comments || [];
+            t.comments.push({ text: input.value, mine: true });
+            input.value = ''; save(); openModal(id);
         }
 
+        function toggleArchive(id, state) { tasks = tasks.map(t => t.id == id ? {...t, archived: state} : t); save(); }
+        function deleteTask(id) { if(confirm("Permanently delete?")) { tasks = tasks.filter(t => t.id != id); save(); } }
         function checkClose(e) { if(e.target.className === 'modal') e.target.style.display = 'none'; }
+        function exportTasks() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks, null, 2));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "PlanTask_backup.json"); dl.click();
+        }
+
         loadData();
     </script>
 </body>
