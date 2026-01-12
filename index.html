@@ -37,7 +37,7 @@
         header { padding: 20px 40px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .view-section { display: none; padding: 30px 40px; overflow-y: auto; flex: 1; }
 
-        /* Timeline Fixes */
+        /* Timeline Styles */
         .timeline-wrapper { display: flex; border: 1px solid var(--border); border-radius: 16px; height: 500px; background: white; overflow: hidden; }
         .t-sidebar { width: 220px; border-right: 1px solid var(--border); background: #F8FAFC; flex-shrink: 0; }
         .t-grid { flex: 1; overflow-x: auto; position: relative; }
@@ -45,6 +45,11 @@
         .t-row { height: 50px; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; padding: 0 15px; font-size: 13px; font-weight: 700; }
         .t-bar { position: absolute; height: 32px; top: 9px; border-radius: 8px; color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; padding: 0 12px; cursor: pointer; white-space: nowrap; z-index: 2; }
         .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today); z-index: 5; pointer-events: none; }
+
+        /* Analytics Styles */
+        .grid-insights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .chart-container { background: white; padding: 20px; border-radius: 16px; border: 1px solid var(--border); height: 300px; }
+        .stat-box { background: white; padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
 
         /* Modals & Tables */
         .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
@@ -173,13 +178,15 @@
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyA1lEjH3Fh747RdRQ-2emPnv_aJqb2Zywo",
-  authDomain: "plantask-collaborative.firebaseapp.com",
-  projectId: "plantask-collaborative",
-  storageBucket: "plantask-collaborative.firebasestorage.app",
-  messagingSenderId: "75156468250",
-  appId: "1:75156468250:web:d5a61c2c78f9195be117a3",
-  measurementId: "G-D4FMXZLX7N" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyA1lEjH3Fh747RdRQ-2emPnv_aJqb2Zywo",
+            authDomain: "plantask-collaborative.firebaseapp.com",
+            projectId: "plantask-collaborative",
+            storageBucket: "plantask-collaborative.firebasestorage.app",
+            messagingSenderId: "75156468250",
+            appId: "1:75156468250:web:d5a61c2c78f9195be117a3",
+            measurementId: "G-D4FMXZLX7N" 
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let tasks = []; let activeCharts = {}; let dragSrc = null;
@@ -198,8 +205,13 @@
             const q = document.getElementById('globalSearch').value.toLowerCase();
             const sort = document.getElementById('sortBy').value;
             let filtered = tasks.filter(t => !t.archived && (t.name.toLowerCase().includes(q)));
-            if(sort === 'priority') { const map = {High:1, Medium:2, Low:3}; filtered.sort((a,b) => map[a.importance] - map[b.importance]); } 
-            else if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+            
+            if(sort === 'priority') { 
+                const map = {High:1, Medium:2, Low:3}; 
+                filtered.sort((a,b) => map[a.importance] - map[b.importance]); 
+            } else if(sort === 'name') {
+                filtered.sort((a,b) => a.name.localeCompare(b.name));
+            }
 
             const cols = {'Not Started':'board-notstarted','In-Progress':'board-inprogress','Finished':'board-finished'};
             Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
@@ -236,6 +248,7 @@
         }
 
         function renderStats() {
+            if (document.getElementById('view-analytics').style.display === 'none') return;
             const done = tasks.filter(t=>t.status==='Finished').length;
             document.getElementById('stat-cards').innerHTML = `<div class="stat-box"><h4>Productivity</h4><div style="font-size:24px; font-weight:800; color:var(--accent)">${Math.round(done/(tasks.length||1)*100)}%</div></div><div class="stat-box"><h4>Active</h4><div style="font-size:24px; font-weight:800; color:var(--primary)">${tasks.filter(t=>t.status==='In-Progress').length}</div></div><div class="stat-box"><h4>Backlog</h4><div style="font-size:24px; font-weight:800; color:var(--text-muted)">${tasks.filter(t=>t.status==='Not Started').length}</div></div><div class="stat-box"><h4>High Risk</h4><div style="font-size:24px; font-weight:800; color:var(--p-high)">${tasks.filter(t=>t.importance==='High').length}</div></div>`;
             const init = (id, type, labels, data, colors) => { if(activeCharts[id]) activeCharts[id].destroy(); activeCharts[id] = new Chart(document.getElementById(id), { type, data: { labels, datasets: [{ data, backgroundColor: colors, fill: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: id.replace('c-', '').toUpperCase() } } } }); };
@@ -263,8 +276,7 @@
         document.getElementById('taskForm').onsubmit = e => {
             e.preventDefault();
             const id = parseInt(document.getElementById('editId').value);
-            let t = tasks.find(x => x.id === id);
-            if(!t) { t = { id: id, logs: [{type:'system',msg:'Created'}] }; tasks.push(t); }
+            let t = tasks.find(x => x.id === id) || { id: id, logs: [{type:'system',msg:'Created'}] };
             t.name = document.getElementById('mName').value;
             t.desc = document.getElementById('mDesc').value;
             t.start = document.getElementById('mStart').value;
@@ -287,7 +299,13 @@
         }
 
         function toggleArchive(id, s) { const t = tasks.find(x => x.id == id); if(t){ t.archived = s; t.closedOn = s ? new Date().toLocaleDateString() : null; saveTask(t); } }
-        function switchView(v, el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); document.getElementById('view-'+v).style.display='block'; }
+        function switchView(v, el) { 
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); 
+            el.classList.add('active'); 
+            document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); 
+            document.getElementById('view-'+v).style.display='block'; 
+            if(v === 'analytics') renderStats();
+        }
         function drag(e, id) { e.dataTransfer.setData("text", id); }
         function drop(e, stat) { const id = e.dataTransfer.getData("text"), t = tasks.find(x => x.id == id); if(t){ t.status = stat; saveTask(t); } }
         function allow(e) { e.preventDefault(); }
