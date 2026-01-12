@@ -18,8 +18,14 @@
     "end": "2026-01-23",
     "owner": "DFS",
     "importance": "High",
-    "status": "Not Started",
-    "archived": false
+    "status": "Finished",
+    "archived": false,
+    "comments": [
+      {
+        "type": "log",
+        "text": "[12:03:00 PM] Moved to Finished"
+      }
+    ]
   },
   {
     "id": 1768214461207,
