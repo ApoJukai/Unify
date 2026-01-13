@@ -177,140 +177,242 @@
         </div>
     </div>
 
-    <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA1lEjH3Fh747RdRQ-2emPnv_aJqb2Zywo",
-            authDomain: "plantask-collaborative.firebaseapp.com",
-            projectId: "plantask-collaborative",
-            storageBucket: "plantask-collaborative.firebasestorage.app",
-            messagingSenderId: "75156468250",
-            appId: "1:75156468250:web:d5a61c2c78f9195be117a3",
-            measurementId: "G-D4FMXZLX7N" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        let tasks = []; let activeCharts = {}; let dragSrc = null;
+   <script>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyA1lEjH3Fh747RdRQ-2emPnv_aJqb2Zywo",
+        authDomain: "plantask-collaborative.firebaseapp.com",
+        projectId: "plantask-collaborative",
+        storageBucket: "plantask-collaborative.firebasestorage.app",
+        messagingSenderId: "75156468250",
+        appId: "1:75156468250:web:d5a61c2c78f9195be117a3",
+        measurementId: "G-D4FMXZLX7N" 
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let tasks = []; 
+    let activeCharts = {}; 
+    let dragSrc = null;
 
-        db.ref('tasks').on('value', snap => {
-            tasks = snap.val() ? Object.values(snap.val()) : [];
-            renderAll();
+    // IMPROVED LISTENER: Ensures tasks are always an array and UI updates instantly
+    db.ref('tasks').on('value', snap => {
+        const data = snap.val();
+        tasks = data ? Object.values(data) : [];
+        renderAll();
+    });
+
+    // FIXED SAVETASK: Explicitly targets the specific task ID in Firebase
+    function saveTask(obj) { 
+        if (!obj.id) obj.id = Date.now();
+        db.ref('tasks/' + obj.id).set(obj); 
+    }
+
+    function hardDelete(id) { 
+        if(confirm("Permanently delete?")) db.ref('tasks/' + id).remove(); 
+    }
+
+    function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
+    
+    function getStatusClass(status) { 
+        if(status === 'Finished') return 'stat-finished'; 
+        if(status === 'In-Progress') return 'stat-in-progress'; 
+        return 'stat-not-started'; 
+    }
+
+    function renderAll() {
+        const q = document.getElementById('globalSearch').value.toLowerCase();
+        const sort = document.getElementById('sortBy').value;
+        
+        let filtered = tasks.filter(t => !t.archived && (t.name.toLowerCase().includes(q)));
+        
+        if(sort === 'priority') { 
+            const map = {High:1, Medium:2, Low:3}; 
+            filtered.sort((a,b) => map[a.importance] - map[b.importance]); 
+        } else if(sort === 'name') {
+            filtered.sort((a,b) => a.name.localeCompare(b.name));
+        }
+
+        const cols = {'Not Started':'board-notstarted','In-Progress':'board-inprogress','Finished':'board-finished'};
+        Object.values(cols).forEach(c => {
+            const el = document.getElementById(c);
+            if(el) el.innerHTML = '';
         });
 
-        function saveTask(obj) { db.ref('tasks/' + obj.id).set(obj).then(() => renderAll()); }
-        function hardDelete(id) { if(confirm("Permanently delete?")) db.ref('tasks/' + id).remove(); }
-        function closeModal() { document.getElementById('taskModal').style.display = 'none'; }
-        function getStatusClass(status) { if(status === 'Finished') return 'stat-finished'; if(status === 'In-Progress') return 'stat-in-progress'; return 'stat-not-started'; }
-
-        function renderAll() {
-            const q = document.getElementById('globalSearch').value.toLowerCase();
-            const sort = document.getElementById('sortBy').value;
-            let filtered = tasks.filter(t => !t.archived && (t.name.toLowerCase().includes(q)));
-            
-            if(sort === 'priority') { 
-                const map = {High:1, Medium:2, Low:3}; 
-                filtered.sort((a,b) => map[a.importance] - map[b.importance]); 
-            } else if(sort === 'name') {
-                filtered.sort((a,b) => a.name.localeCompare(b.name));
+        filtered.forEach(t => {
+            const color = t.importance === 'High' ? 'var(--p-high)' : t.importance === 'Medium' ? 'var(--p-med)' : 'var(--p-low)';
+            const targetCol = document.getElementById(cols[t.status]);
+            if(targetCol) {
+                targetCol.innerHTML += `
+                    <div class="task-card" onclick="openModal(${t.id})" draggable="true" ondragstart="drag(event, ${t.id})" style="border-top:4px solid ${color};">
+                        <div style="font-weight:800; font-size:14px; margin-bottom:6px;">${t.name}</div>
+                        <div style="font-size:11px; color:var(--text-muted); font-weight:700;">${(t.owner||'NO OWNER').toUpperCase()}</div>
+                    </div>`;
             }
+        });
 
-            const cols = {'Not Started':'board-notstarted','In-Progress':'board-inprogress','Finished':'board-finished'};
-            Object.values(cols).forEach(c => document.getElementById(c).innerHTML = '');
-            filtered.forEach(t => {
-                const color = t.importance === 'High' ? 'var(--p-high)' : t.importance === 'Medium' ? 'var(--p-med)' : 'var(--p-low)';
-                document.getElementById(cols[t.status]).innerHTML += `<div class="task-card" onclick="openModal(${t.id})" draggable="true" ondragstart="drag(event, ${t.id})" style="border-top:4px solid ${color};"><div style="font-weight:800; font-size:14px; margin-bottom:6px;">${t.name}</div><div style="font-size:11px; color:var(--text-muted); font-weight:700;">${(t.owner||'NO OWNER').toUpperCase()}</div></div>`;
-            });
+        document.getElementById('list-tbody').innerHTML = filtered.map(t => `
+            <tr class="list-row" draggable="true" ondragstart="hDrag(event, ${t.id})" ondrop="hDrop(event, ${t.id})" ondragover="event.preventDefault()">
+                <td><i data-lucide="grip-vertical" size="14"></i></td>
+                <td><div style="font-weight:800;">${t.name}</div><div style="font-size:11px; color:var(--text-muted);">${t.desc||''}</div></td>
+                <td style="font-size:12px; font-weight:800;">${(t.owner||'-').toUpperCase()}</td>
+                <td><span class="priority-badge p-${t.importance.toLowerCase()}">${t.importance}</span></td>
+                <td><span class="status-badge ${getStatusClass(t.status)}">${t.status}</span></td>
+                <td style="text-align:right">
+                    <button class="btn-icon" onclick="openModal(${t.id})"><i data-lucide="edit-3" size="14"></i></button>
+                    <button class="btn-icon" onclick="toggleArchive(${t.id}, true)"><i data-lucide="package" size="14"></i></button>
+                </td>
+            </tr>`).join('');
 
-            document.getElementById('list-tbody').innerHTML = filtered.map(t => `<tr class="list-row" draggable="true" ondragstart="hDrag(event, ${t.id})" ondrop="hDrop(event, ${t.id})" ondragover="event.preventDefault()"><td><i data-lucide="grip-vertical" size="14"></i></td><td><div style="font-weight:800;">${t.name}</div><div style="font-size:11px; color:var(--text-muted);">${t.desc||''}</div></td><td style="font-size:12px; font-weight:800;">${(t.owner||'-').toUpperCase()}</td><td><span class="priority-badge p-${t.importance.toLowerCase()}">${t.importance}</span></td><td><span class="status-badge ${getStatusClass(t.status)}">${t.status}</span></td><td style="text-align:right"><button class="btn-icon" onclick="openModal(${t.id})"><i data-lucide="edit-3" size="14"></i></button><button class="btn-icon" onclick="toggleArchive(${t.id}, true)"><i data-lucide="package" size="14"></i></button></td></tr>`).join('');
-            document.getElementById('archive-tbody').innerHTML = tasks.filter(t => t.archived).map(t => `<tr class="list-row"><td><b>${t.name}</b></td><td>${t.owner}</td><td>${t.closedOn}</td><td style="text-align:right"><button class="btn-icon" onclick="toggleArchive(${t.id}, false)"><i data-lucide="rotate-ccw" size="14"></i></button><button class="btn-icon" style="color:red" onclick="hardDelete(${t.id})"><i data-lucide="trash-2" size="14"></i></button></td></tr>`).join('');
+        document.getElementById('archive-tbody').innerHTML = tasks.filter(t => t.archived).map(t => `
+            <tr class="list-row">
+                <td><b>${t.name}</b></td><td>${t.owner}</td><td>${t.closedOn}</td>
+                <td style="text-align:right">
+                    <button class="btn-icon" onclick="toggleArchive(${t.id}, false)"><i data-lucide="rotate-ccw" size="14"></i></button>
+                    <button class="btn-icon" style="color:red" onclick="hardDelete(${t.id})"><i data-lucide="trash-2" size="14"></i></button>
+                </td>
+            </tr>`).join('');
 
-            renderTimeline(); renderStats(); lucide.createIcons();
+        renderTimeline(); 
+        renderStats(); 
+        lucide.createIcons();
+    }
+
+    function renderTimeline() {
+        const side = document.getElementById('t-side-rows'), bars = document.getElementById('t-bars-rows'), heads = document.getElementById('t-headers');
+        if(!side || !bars || !heads) return;
+        side.innerHTML = ''; bars.innerHTML = ''; heads.innerHTML = '';
+        const startBase = new Date(); startBase.setDate(startBase.getDate()-5); startBase.setHours(0,0,0,0);
+        const dayW = 80; const today = new Date(); today.setHours(0,0,0,0);
+        
+        for(let i=0; i<30; i++) {
+            let d = new Date(startBase); d.setDate(d.getDate()+i); const isToday = d.getTime() === today.getTime();
+            heads.innerHTML += `<div style="width:${dayW}px; text-align:center; height:50px; display:flex; flex-direction:column; justify-content:center; border-right:1px solid #F1F5F9; ${isToday?'color:var(--today);font-weight:900':''}"><span>${d.getDate()}</span><span style="font-size:8px;">${d.toLocaleDateString([],{month:'short'})}</span></div>`;
+            if(isToday) { const line = document.createElement('div'); line.className = 'today-line'; line.style.left = (i * dayW + dayW/2) + 'px'; bars.appendChild(line); }
         }
 
-        function renderTimeline() {
-            const side = document.getElementById('t-side-rows'), bars = document.getElementById('t-bars-rows'), heads = document.getElementById('t-headers');
-            side.innerHTML = ''; bars.innerHTML = ''; heads.innerHTML = '';
-            const startBase = new Date(); startBase.setDate(startBase.getDate()-5); startBase.setHours(0,0,0,0);
-            const dayW = 80; const today = new Date(); today.setHours(0,0,0,0);
-            for(let i=0; i<30; i++) {
-                let d = new Date(startBase); d.setDate(d.getDate()+i); const isToday = d.getTime() === today.getTime();
-                heads.innerHTML += `<div style="width:${dayW}px; text-align:center; height:50px; display:flex; flex-direction:column; justify-content:center; border-right:1px solid #F1F5F9; ${isToday?'color:var(--today);font-weight:900':''}"><span>${d.getDate()}</span><span style="font-size:8px;">${d.toLocaleDateString([],{month:'short'})}</span></div>`;
-                if(isToday) { const line = document.createElement('div'); line.className = 'today-line'; line.style.left = (i * dayW + dayW/2) + 'px'; bars.appendChild(line); }
-            }
-            tasks.filter(t => !t.archived && t.start && t.end).forEach(t => {
-                side.innerHTML += `<div class="t-row">${t.name}</div>`;
-                const sDate = new Date(t.start + "T00:00:00"), eDate = new Date(t.end + "T23:59:59");
-                const offset = Math.floor((sDate - startBase) / 864e5), dur = Math.ceil((eDate - sDate) / 864e5);
-                const row = document.createElement('div'); row.style.height = '50px'; row.style.borderBottom = '1px solid #F1F5F9'; row.style.width = (30 * dayW) + 'px';
-                const bar = document.createElement('div'); bar.className = 't-bar'; bar.style.left = (offset * dayW) + 'px'; bar.style.width = (dur * dayW) + 'px';
-                bar.style.background = t.status === 'Finished' ? 'var(--accent)' : t.status === 'In-Progress' ? 'var(--primary)' : '#94A3B8';
-                bar.innerText = t.name; bar.onclick = () => openModal(t.id); row.appendChild(bar); bars.appendChild(row);
-            });
-        }
+        tasks.filter(t => !t.archived && t.start && t.end).forEach(t => {
+            side.innerHTML += `<div class="t-row">${t.name}</div>`;
+            const sDate = new Date(t.start + "T00:00:00"), eDate = new Date(t.end + "T23:59:59");
+            const offset = Math.floor((sDate - startBase) / 864e5), dur = Math.ceil((eDate - sDate) / 864e5);
+            const row = document.createElement('div'); row.style.height = '50px'; row.style.borderBottom = '1px solid #F1F5F9'; row.style.width = (30 * dayW) + 'px';
+            const bar = document.createElement('div'); bar.className = 't-bar'; bar.style.left = (offset * dayW) + 'px'; bar.style.width = (dur * dayW) + 'px';
+            bar.style.background = t.status === 'Finished' ? 'var(--accent)' : t.status === 'In-Progress' ? 'var(--primary)' : '#94A3B8';
+            bar.innerText = t.name; bar.onclick = () => openModal(t.id); row.appendChild(bar); bars.appendChild(row);
+        });
+    }
 
-        function renderStats() {
-            if (document.getElementById('view-analytics').style.display === 'none') return;
-            const done = tasks.filter(t=>t.status==='Finished').length;
-            document.getElementById('stat-cards').innerHTML = `<div class="stat-box"><h4>Productivity</h4><div style="font-size:24px; font-weight:800; color:var(--accent)">${Math.round(done/(tasks.length||1)*100)}%</div></div><div class="stat-box"><h4>Active</h4><div style="font-size:24px; font-weight:800; color:var(--primary)">${tasks.filter(t=>t.status==='In-Progress').length}</div></div><div class="stat-box"><h4>Backlog</h4><div style="font-size:24px; font-weight:800; color:var(--text-muted)">${tasks.filter(t=>t.status==='Not Started').length}</div></div><div class="stat-box"><h4>High Risk</h4><div style="font-size:24px; font-weight:800; color:var(--p-high)">${tasks.filter(t=>t.importance==='High').length}</div></div>`;
-            const init = (id, type, labels, data, colors) => { if(activeCharts[id]) activeCharts[id].destroy(); activeCharts[id] = new Chart(document.getElementById(id), { type, data: { labels, datasets: [{ data, backgroundColor: colors, fill: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: id.replace('c-', '').toUpperCase() } } } }); };
-            init('c-velocity', 'line', ['W1','W2','W3','W4'], [2,5,3,done], '#6366F1');
-            init('c-status', 'doughnut', ['Done','Active','Backlog'], [done, tasks.filter(t=>t.status==='In-Progress').length, tasks.filter(t=>t.status==='Not Started').length], ['#10B981','#6366F1','#CBD5E1']);
-            const owners = {}; tasks.forEach(t => { const o = t.owner || 'Unassigned'; owners[o] = (owners[o]||0)+1; });
-            init('c-workload', 'radar', Object.keys(owners), Object.values(owners), 'rgba(99, 102, 241, 0.2)');
-            const p = {High:0, Medium:0, Low:0}; tasks.forEach(t => p[t.importance]++); init('c-priority', 'polarArea', ['High','Med','Low'], [p.High, p.Medium, p.Low], ['#EF4444','#F59E0B','#94A3B8']);
-        }
-
-        function openModal(id = null) {
-            const t = tasks.find(x => x.id == id) || { id: Date.now(), name: '', status: 'Not Started', importance: 'Medium', logs: [] };
-            document.getElementById('editId').value = t.id;
-            document.getElementById('mName').value = t.name || '';
-            document.getElementById('mDesc').value = t.desc || '';
-            document.getElementById('mStart').value = t.start || '';
-            document.getElementById('mEnd').value = t.end || '';
-            document.getElementById('mOwner').value = t.owner || '';
-            document.getElementById('mImp').value = t.importance;
-            document.getElementById('mStat').value = t.status;
-            document.getElementById('chatContainer').innerHTML = (t.logs||[]).map(l => `<div class="sms-bubble ${l.type==='user'?'sms-user':'sms-system'}">${l.msg}</div>`).join('');
-            document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        document.getElementById('taskForm').onsubmit = e => {
-            e.preventDefault();
-            const id = parseInt(document.getElementById('editId').value);
-            let t = tasks.find(x => x.id === id) || { id: id, logs: [{type:'system',msg:'Created'}] };
-            t.name = document.getElementById('mName').value;
-            t.desc = document.getElementById('mDesc').value;
-            t.start = document.getElementById('mStart').value;
-            t.end = document.getElementById('mEnd').value;
-            t.owner = document.getElementById('mOwner').value;
-            t.importance = document.getElementById('mImp').value;
-            t.status = document.getElementById('mStat').value;
-            t.archived = false;
-            saveTask(t); closeModal();
+    function renderStats() {
+        if(document.getElementById('view-analytics').style.display === 'none') return;
+        const done = tasks.filter(t=>t.status==='Finished').length;
+        document.getElementById('stat-cards').innerHTML = `
+            <div class="stat-box" style="background:white; padding:20px; border-radius:16px; border:1px solid var(--border)"><h4>Productivity</h4><div style="font-size:24px; font-weight:800; color:var(--accent)">${Math.round(done/(tasks.length||1)*100)}%</div></div>
+            <div class="stat-box" style="background:white; padding:20px; border-radius:16px; border:1px solid var(--border)"><h4>Active</h4><div style="font-size:24px; font-weight:800; color:var(--primary)">${tasks.filter(t=>t.status==='In-Progress').length}</div></div>
+            <div class="stat-box" style="background:white; padding:20px; border-radius:16px; border:1px solid var(--border)"><h4>Backlog</h4><div style="font-size:24px; font-weight:800; color:var(--text-muted)">${tasks.filter(t=>t.status==='Not Started').length}</div></div>
+            <div class="stat-box" style="background:white; padding:20px; border-radius:16px; border:1px solid var(--border)"><h4>High Risk</h4><div style="font-size:24px; font-weight:800; color:var(--p-high)">${tasks.filter(t=>t.importance==='High').length}</div></div>`;
+        
+        const init = (id, type, labels, data, colors) => { 
+            if(activeCharts[id]) activeCharts[id].destroy(); 
+            activeCharts[id] = new Chart(document.getElementById(id), { 
+                type, 
+                data: { labels, datasets: [{ data, backgroundColor: colors, fill: false }] }, 
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: id.replace('c-', '').toUpperCase() } } } 
+            }); 
         };
+        init('c-velocity', 'line', ['W1','W2','W3','W4'], [2,5,3,done], '#6366F1');
+        init('c-status', 'doughnut', ['Done','Active','Backlog'], [done, tasks.filter(t=>t.status==='In-Progress').length, tasks.filter(t=>t.status==='Not Started').length], ['#10B981','#6366F1','#CBD5E1']);
+        
+        const owners = {}; tasks.forEach(t => { const o = t.owner || 'Unassigned'; owners[o] = (owners[o]||0)+1; });
+        init('c-workload', 'radar', Object.keys(owners), Object.values(owners), 'rgba(99, 102, 241, 0.2)');
+        
+        const p = {High:0, Medium:0, Low:0}; tasks.forEach(t => p[t.importance]++); 
+        init('c-priority', 'polarArea', ['High','Med','Low'], [p.High, p.Medium, p.Low], ['#EF4444','#F59E0B','#94A3B8']);
+    }
 
-        function addNote() {
-            const id = parseInt(document.getElementById('editId').value), input = document.getElementById('chatInput');
-            if(!id || !input.value.trim()) return;
-            const t = tasks.find(x => x.id === id); if(!t) return;
-            if(!t.logs) t.logs = []; t.logs.push({ type:'user', msg:input.value });
-            input.value = ''; saveTask(t);
-            document.getElementById('chatContainer').innerHTML = t.logs.map(l => `<div class="sms-bubble ${l.type==='user'?'sms-user':'sms-system'}">${l.msg}</div>`).join('');
-            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
-        }
+    function openModal(id = null) {
+        const t = tasks.find(x => x.id == id) || { id: Date.now(), name: '', status: 'Not Started', importance: 'Medium', logs: [] };
+        document.getElementById('editId').value = t.id;
+        document.getElementById('mName').value = t.name || '';
+        document.getElementById('mDesc').value = t.desc || '';
+        document.getElementById('mStart').value = t.start || '';
+        document.getElementById('mEnd').value = t.end || '';
+        document.getElementById('mOwner').value = t.owner || '';
+        document.getElementById('mImp').value = t.importance;
+        document.getElementById('mStat').value = t.status;
+        document.getElementById('chatContainer').innerHTML = (t.logs||[]).map(l => `<div class="sms-bubble ${l.type==='user'?'sms-user':'sms-system'}">${l.msg}</div>`).join('');
+        document.getElementById('taskModal').style.display = 'flex';
+    }
 
-        function toggleArchive(id, s) { const t = tasks.find(x => x.id == id); if(t){ t.archived = s; t.closedOn = s ? new Date().toLocaleDateString() : null; saveTask(t); } }
-        function switchView(v, el) { 
-            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); 
-            el.classList.add('active'); 
-            document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); 
-            document.getElementById('view-'+v).style.display='block'; 
-            if(v === 'analytics') renderStats();
-        }
-        function drag(e, id) { e.dataTransfer.setData("text", id); }
-        function drop(e, stat) { const id = e.dataTransfer.getData("text"), t = tasks.find(x => x.id == id); if(t){ t.status = stat; saveTask(t); } }
-        function allow(e) { e.preventDefault(); }
-        function hDrag(e, id) { dragSrc = id; }
-        function hDrop(e, targetId) { e.preventDefault(); const from = tasks.findIndex(t => t.id === dragSrc), to = tasks.findIndex(t => t.id === targetId); const temp = tasks[from]; tasks.splice(from, 1); tasks.splice(to, 0, temp); db.ref('tasks').set(tasks.reduce((a,v)=>({ ...a, [v.id]:v }), {})); }
-    </script>
+    // FIXED FORM SUBMISSION: Correctly merges data and sends to Firebase
+    document.getElementById('taskForm').onsubmit = e => {
+        e.preventDefault();
+        const id = parseInt(document.getElementById('editId').value);
+        let existingTask = tasks.find(x => x.id === id);
+        
+        let t = {
+            id: id,
+            name: document.getElementById('mName').value,
+            desc: document.getElementById('mDesc').value,
+            start: document.getElementById('mStart').value,
+            end: document.getElementById('mEnd').value,
+            owner: document.getElementById('mOwner').value,
+            importance: document.getElementById('mImp').value,
+            status: document.getElementById('mStat').value,
+            archived: existingTask ? !!existingTask.archived : false,
+            logs: existingTask ? (existingTask.logs || []) : [{type:'system',msg:'Created'}]
+        };
+        
+        saveTask(t); 
+        closeModal();
+    };
+
+    function addNote() {
+        const id = parseInt(document.getElementById('editId').value), input = document.getElementById('chatInput');
+        if(!id || !input.value.trim()) return;
+        const t = tasks.find(x => x.id === id); 
+        if(!t) return;
+        if(!t.logs) t.logs = []; 
+        t.logs.push({ type:'user', msg:input.value });
+        input.value = ''; 
+        saveTask(t);
+        document.getElementById('chatContainer').innerHTML = t.logs.map(l => `<div class="sms-bubble ${l.type==='user'?'sms-user':'sms-system'}">${l.msg}</div>`).join('');
+        document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+    }
+
+    function toggleArchive(id, s) { 
+        const t = tasks.find(x => x.id == id); 
+        if(t){ 
+            t.archived = s; 
+            t.closedOn = s ? new Date().toLocaleDateString() : null; 
+            saveTask(t); 
+        } 
+    }
+
+    function switchView(v, el) { 
+        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); 
+        el.classList.add('active'); 
+        document.querySelectorAll('.view-section').forEach(s=>s.style.display='none'); 
+        document.getElementById('view-'+v).style.display='block'; 
+        if(v === 'analytics') renderStats();
+    }
+
+    function drag(e, id) { e.dataTransfer.setData("text", id); }
+    function drop(e, stat) { 
+        const id = e.dataTransfer.getData("text");
+        const t = tasks.find(x => x.id == id); 
+        if(t){ t.status = stat; saveTask(t); } 
+    }
+    function allow(e) { e.preventDefault(); }
+    function hDrag(e, id) { dragSrc = id; }
+    function hDrop(e, targetId) { 
+        e.preventDefault(); 
+        const from = tasks.findIndex(t => t.id === dragSrc);
+        const to = tasks.findIndex(t => t.id === targetId); 
+        const temp = tasks[from]; 
+        tasks.splice(from, 1); 
+        tasks.splice(to, 0, temp); 
+        db.ref('tasks').set(tasks.reduce((a,v)=>({ ...a, [v.id]:v }), {})); 
+    }
+</script>
 </body>
 </html>
+
